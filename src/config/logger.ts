@@ -1,5 +1,6 @@
 import winston from 'winston'
 import env from './env'
+import { getUserIdFromContext } from './context'
 
 const { combine, timestamp, printf, align } = winston.format
 const logLevels = {
@@ -12,7 +13,7 @@ const logLevels = {
 }
 
 const logFormat = printf(({ level, message, timestamp }) => {
-  return `[${timestamp}] ${level}: ${message}`
+  return `[${timestamp}] [${getUserIdFromContext()}] ${level}: ${message}`
 })
 
 const logFolder = env.getOrDefault('LOG_FOLDER', './logs')
