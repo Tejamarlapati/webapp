@@ -6,6 +6,8 @@ import helmet from 'helmet'
 import env from './config/env'
 import routes from './routes/index'
 import logger from './config/logger'
+import database from './config/database'
+import { jsonErrorHandler } from './config/middleware'
 
 // Setup .env file
 env.loadEnv()
@@ -18,7 +20,10 @@ const app = express()
 app.use(httpContext.middleware)
 
 // Setup Express Middlewares
-app.use(express.text({ type: '*/*' }))
+app.use(express.json())
+app.use(jsonErrorHandler())
+app.use(express.urlencoded({ extended: true }))
+app.use(express.text({ type: 'text/*' }))
 app.use(cors())
 app.use(helmet.noSniff())
 
@@ -27,6 +32,7 @@ routes(app)
 
 // Express Server
 app.listen(port, () => {
+  database.getDatabaseConnection().sync()
   logger.info(`Server listening on port ${port}`)
 })
 

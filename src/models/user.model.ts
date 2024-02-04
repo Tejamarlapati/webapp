@@ -9,6 +9,12 @@ class User extends Model {
   public password!: string
   public account_created!: Date
   public account_updated!: Date
+
+  toJSON(): object {
+    const values = Object.assign({}, this.get())
+    delete values.password
+    return values
+  }
 }
 
 User.init(

@@ -2,10 +2,17 @@ import bcrypt from 'bcrypt'
 
 const salt = bcrypt.genSaltSync(10)
 
-export const hashPassword = async (password: string) => {
+const hashPassword = async (password: string) => {
   return bcrypt.hash(password, salt)
 }
 
-export const comparePassword = async (hashedPassword: string, password: string) => {
+const comparePassword = async (password: string, hashedPassword: string) => {
   return bcrypt.compare(password, hashedPassword)
 }
+
+const crypto = {
+  hashPassword,
+  comparePassword
+}
+
+export default crypto

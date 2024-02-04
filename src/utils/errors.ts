@@ -10,6 +10,8 @@ export class HttpStatusError extends Error implements ResultError<HttpStatusErro
     super(message)
     this.statusCode = statusCode
     this.name = 'HttpStatusError'
+    this.ok = false
+    this.error = this
   }
 }
 

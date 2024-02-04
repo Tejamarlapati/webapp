@@ -1,10 +1,10 @@
-import { hashPassword } from '../config/crypto'
 import User from '../models/user.model'
 import logger from '../config/logger'
 import { Ok, Result } from '../utils/result'
-import { InternalServerError, NotFoundError, UnauthorizedError, ValidationError } from '../utils/errors'
+import { InternalServerError, NotFoundError, ValidationError } from '../utils/errors'
 import { getUserIdFromContext } from '../config/context'
 import validator from '../utils/validator'
+import crypto from '../config/crypto'
 
 interface IUserService {
   createUser(user: User): Promise<Result<User, Error>>
@@ -16,7 +16,7 @@ class UserService implements IUserService {
   async createUser(user: User): Promise<Result<User, Error>> {
     try {
       // Validate the user
-      const validationError = await this.validateUser(user, true)
+      const validationError = await this.validateCreateUser(user)
       if (validationError) {
         return new ValidationError(validationError)
       }
@@ -29,7 +29,7 @@ class UserService implements IUserService {
       }
 
       // Hash the password
-      const hashedPassword = await hashPassword(user.password)
+      const hashedPassword = await crypto.hashPassword(user.password)
 
       // Create the user model
       const newUser = new User({
@@ -41,7 +41,7 @@ class UserService implements IUserService {
 
       // Save the user to the database
       const savedUser = await newUser.save()
-      return Ok(savedUser)
+      return Ok(savedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error creating user: ${error}`)
       return new InternalServerError(`Error creating user: ${error}`)
@@ -51,21 +51,16 @@ class UserService implements IUserService {
   async updateUser(user: User): Promise<Result<User, Error>> {
     try {
       // Validate the user
-      const validationError = await this.validateUser(user, false)
+      const validationError = await this.validateUpdateUser(user)
       if (validationError) {
         return new ValidationError(validationError)
       }
 
-      // Find the user by username/email
-      const username = user.username
-      const existingUser = await User.findOne({ where: { username } })
+      // Find the user by user id from context
+      const userId = getUserIdFromContext()
+      const existingUser = await User.findByPk(userId)
       if (!existingUser) {
         return new NotFoundError('User not found')
-      }
-
-      const loggedInUser = getUserIdFromContext()
-      if (existingUser.id !== loggedInUser) {
-        return new UnauthorizedError('You are not authorized to update this user')
       }
 
       // Update only allowed fields
@@ -74,13 +69,13 @@ class UserService implements IUserService {
 
       // Hash the password if provided
       if (user.password) {
-        const hashedPassword = await hashPassword(user.password)
+        const hashedPassword = await crypto.hashPassword(user.password)
         existingUser.password = hashedPassword
       }
 
       // Save the updated user to the database
       const updatedUser = await existingUser.save()
-      return Ok(updatedUser)
+      return Ok(updatedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error updating user: ${error}`)
       return new InternalServerError(`Error updating user: ${error}`)
@@ -101,14 +96,48 @@ class UserService implements IUserService {
     }
   }
 
-  async validateUser(user: User, isCreate: boolean): Promise<string | null> {
+  async validateCreateUser(user: User): Promise<string | null> {
     if (!user) return 'User details have to be defined'
-    else if (validator.isEmpty(user.username)) return 'Username/email is required'
     else if (validator.isEmpty(user.first_name)) return 'First name is required'
     else if (validator.isEmpty(user.last_name)) return 'Last name is required'
     else if (validator.isEmpty(user.password)) return 'Password is required'
+    else if (validator.isEmpty(user.username)) return 'email is required'
+    else if (!validator.isValidEmail(user.username)) return 'email is invalid'
+
     try {
-      isCreate && (await user.validate())
+      const userModel = User.build({
+        username: user.username,
+        password: user.password,
+        first_name: user.first_name,
+        last_name: user.last_name
+      })
+      await userModel.validate()
+    } catch (err) {
+      return err.message
+    }
+    return null
+  }
+
+  async validateUpdateUser(user: User): Promise<string | null> {
+    if (!user) return 'User details have to be defined'
+    const updatableFields = ['first_name', 'last_name', 'password']
+
+    const update: Record<string, string> = {}
+    for (const field in user) {
+      if (!updatableFields.includes(field)) {
+        return `Field ${field} cannot be updated`
+      }
+      const value = user[field as keyof User] as string
+      if (validator.isEmpty(value)) {
+        return `${field} cannot be empty`
+      }
+
+      update[field] = value
+    }
+
+    try {
+      const userModel = User.build(update)
+      await userModel.validate({ fields: Object.keys(update) })
     } catch (err) {
       return err.message
     }

@@ -1,5 +1,11 @@
-export type ResultOk<T> = { ok: true; value: T }
-export type ResultError<E extends Error> = { ok: false; error: E }
+export interface ResultOk<T> {
+  ok: true
+  value: T
+}
+export interface ResultError<E extends Error> {
+  ok: false
+  error: E
+}
 export type Result<T, E extends Error> = ResultOk<T> | ResultError<E>
 
 export const Ok = <T>(data: T): Result<T, never> => {
