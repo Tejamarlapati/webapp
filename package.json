@@ -6,9 +6,9 @@
   "scripts": {
     "clean:logs": "rm -rf logs",
     "clean": "rm -rf dist/",
-    "build": "npm run clean && tsc",
-    "dev": "tsc --watch --outDir build & NODE_ENV=development nodemon build/src/server",
-    "start": "cd dist && NODE_ENV=production node --nolazy src/server",
+    "build": "npm run clean && tsc -p tsconfig.production.json",
+    "dev": "tsc --watch & NODE_ENV=development nodemon build/src/server",
+    "start": "cd dist && NODE_ENV=production node --nolazy server",
     "lint": "eslint ./**/*.ts",
     "lint:fix": "eslint ./**/*.ts --fix",
     "test": "mocha --exit",

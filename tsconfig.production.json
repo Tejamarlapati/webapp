@@ -6,7 +6,7 @@
             "ESNext",
             "dom"
         ],
-        "outDir": "./build",
+        "outDir": "./dist",
         "removeComments": true,
         "target": "ES6",
         "baseUrl": "./",
@@ -27,10 +27,10 @@
         "noUnusedParameters": true,
     },
     "include": [
-        "./**/*.ts",
-        "tests/**/*.ts",
+        "./**/*.ts"
     ],
     "exclude": [
-        "node_modules/**/*"
+        "node_modules/**/*",
+        "tests/**/*.ts",
     ]
 }
