@@ -8,6 +8,7 @@ import routes from './routes/index'
 import logger from './config/logger'
 import database from './config/database'
 import { jsonErrorHandler } from './config/middleware'
+import healthCheckService from './services/healthcheck.service'
 
 // Setup .env file
 env.loadEnv()
@@ -31,8 +32,9 @@ app.use(helmet.noSniff())
 routes(app)
 
 // Express Server
-app.listen(port, () => {
-  database.getDatabaseConnection().sync()
+app.listen(port, async () => {
+  const isDatabaseUp = await healthCheckService.databaseHealthCheck()
+  if (isDatabaseUp) database.getDatabaseConnection().sync({ force: true })
   logger.info(`Server listening on port ${port}`)
 })
 
