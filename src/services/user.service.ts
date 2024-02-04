@@ -15,6 +15,7 @@ interface IUserService {
 class UserService implements IUserService {
   async createUser(user: User): Promise<Result<User, Error>> {
     try {
+      logger.info('Creating user')
       // Validate the user
       const validationError = await this.validateCreateUser(user)
       if (validationError) {
@@ -23,6 +24,8 @@ class UserService implements IUserService {
 
       // Check if user with the given email already exists
       const username = user.username
+      logger.info('Creating user with username: ' + username)
+
       const existingUser = await User.findOne({ where: { username } })
       if (existingUser) {
         return new ValidationError('User with this username already exists')
@@ -41,6 +44,7 @@ class UserService implements IUserService {
 
       // Save the user to the database
       const savedUser = await newUser.save()
+      logger.info('Created user with id: ' + savedUser.id)
       return Ok(savedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error creating user: ${error}`)
@@ -50,6 +54,8 @@ class UserService implements IUserService {
 
   async updateUser(user: User): Promise<Result<User, Error>> {
     try {
+      logger.info('Updating user')
+
       // Validate the user
       const validationError = await this.validateUpdateUser(user)
       if (validationError) {
@@ -58,6 +64,8 @@ class UserService implements IUserService {
 
       // Find the user by user id from context
       const userId = getUserIdFromContext()
+      logger.info('Updating user with userId: ' + userId)
+
       const existingUser = await User.findByPk(userId)
       if (!existingUser) {
         return new NotFoundError('User not found')
@@ -75,6 +83,7 @@ class UserService implements IUserService {
 
       // Save the updated user to the database
       const updatedUser = await existingUser.save()
+      logger.info('Updated user with id: ' + updatedUser.id)
       return Ok(updatedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error updating user: ${error}`)
@@ -85,6 +94,7 @@ class UserService implements IUserService {
   async getUser(): Promise<Result<User, Error>> {
     try {
       const loggedInUser = getUserIdFromContext()
+      logger.info('Fetching user details for userid: ' + loggedInUser)
       const user = await User.findByPk(loggedInUser)
       if (!user) {
         return new NotFoundError('User not found')

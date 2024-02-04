@@ -55,13 +55,26 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
 
 ### Running API server locally
 
-    npm run start
+    npm run dev
 
 You will know server is running by checking the output of the command `npm run start`
 
     [2024-01-28 12:04:08 PM] info:  Server listening on port 8080
 
-**Note:** `8080` will be your PORT_NUMBER from .env
+**Note:** `8080` will be your `PORT_NUMBER` from .env
+
+### Running API on production
+
+Build the application using the following command.
+This would generate a folder called dist in the current directory
+
+    npm run build
+
+To serve the node application, use the following command
+
+    npm start
+
+**Note:** Make sure the `.env` file in the dist folder is setup with required properties else the default properties are loaded
 
 ## Tests
 
