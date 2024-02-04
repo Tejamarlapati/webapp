@@ -3,7 +3,7 @@ import validator from '../../src/utils/validator'
 
 chai.should()
 
-describe('Health Check Service Tests', function () {
+describe('Validator Tests', function () {
   it('should return true when data is null', () => {
     validator.isNullOrUndefined(null).should.be.true
   })

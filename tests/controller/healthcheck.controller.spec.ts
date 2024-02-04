@@ -11,7 +11,7 @@ import {
 chai.should()
 chai.use(chaiHTTP)
 
-describe('Health Check Service Tests', function () {
+describe('Health Check Controller Tests', function () {
   const db = database
 
   // Setup the database connection before all tests

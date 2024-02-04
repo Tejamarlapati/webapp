@@ -11,7 +11,7 @@ import {
 
 chai.should()
 
-describe('Health Check Service Tests', function () {
+describe('Database Tests', function () {
   this.beforeEach(() => {
     resetEnvironmentVariables(TEST_DB_CONNECTION_STRING)
     resetEnvironmentVariables(TEST_DB_PROPERTIES)

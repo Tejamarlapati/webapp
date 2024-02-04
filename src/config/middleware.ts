@@ -7,10 +7,8 @@ import { setUserIdInContext } from './context'
 import { StatusCodes } from 'http-status-codes'
 
 export const jsonErrorHandler = () => {
-  return (err: Error, req: Request, res: Response, next: NextFunction) => {
-    if (!err) {
-      return next()
-    }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  return (err: Error, req: Request, res: Response, _: NextFunction) => {
     logger.error(`Error: ${err.message} Request body: ${req.body}`)
     res.status(StatusCodes.BAD_REQUEST).send()
   }
@@ -47,14 +45,14 @@ export const authorized = () => {
     const username = result.name
     const user = await User.scope(['withPassword']).findOne({ where: { username } })
     if (!user) {
-      logger.info(`Cannot find user. User: ${result?.name}`)
+      logger.info(`Cannot find user. User: ${result!.name}`)
       res.status(401).send()
       return
     }
 
     const isPasswordMatch = await crypto.comparePassword(result!.pass, user!.password)
     if (!isPasswordMatch) {
-      logger.info(`Password mismatch. User: ${result?.name}`)
+      logger.info(`Password mismatch. User: ${result!.name}`)
       res.status(401).send()
       return
     }

@@ -1,25 +1,32 @@
 import User from '../models/user.model'
 import logger from '../config/logger'
 import { Ok, Result } from '../utils/result'
-import { InternalServerError, NotFoundError, ValidationError } from '../utils/errors'
-import { getUserIdFromContext } from '../config/context'
 import validator from '../utils/validator'
-import crypto from '../config/crypto'
+import errors from '../utils/errors'
+import crypto, { ICrypto } from '../config/crypto'
+import httpContext, { IContext } from '../config/context'
 
-interface IUserService {
+export interface IUserService {
   createUser(user: User): Promise<Result<User, Error>>
   updateUser(user: User): Promise<Result<User, Error>>
   getUser(): Promise<Result<User, Error>>
 }
 
-class UserService implements IUserService {
+export class UserService implements IUserService {
+  crypto: ICrypto
+  httpContext: IContext
+  constructor(crypto: ICrypto, httpContext: IContext) {
+    this.crypto = crypto
+    this.httpContext = httpContext
+  }
+
   async createUser(user: User): Promise<Result<User, Error>> {
     try {
       logger.info('Creating user')
       // Validate the user
       const validationError = await this.validateCreateUser(user)
       if (validationError) {
-        return new ValidationError(validationError)
+        return errors.validationError(validationError)
       }
 
       // Check if user with the given email already exists
@@ -28,11 +35,11 @@ class UserService implements IUserService {
 
       const existingUser = await User.findOne({ where: { username } })
       if (existingUser) {
-        return new ValidationError('User with this username already exists')
+        return errors.validationError('User with this username already exists')
       }
 
       // Hash the password
-      const hashedPassword = await crypto.hashPassword(user.password)
+      const hashedPassword = await this.crypto.hashPassword(user.password)
 
       // Create the user model
       const newUser = new User({
@@ -48,7 +55,7 @@ class UserService implements IUserService {
       return Ok(savedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error creating user: ${error}`)
-      return new InternalServerError(`Error creating user: ${error}`)
+      return errors.internalServerError(`Error creating user: ${error}`)
     }
   }
 
@@ -59,16 +66,16 @@ class UserService implements IUserService {
       // Validate the user
       const validationError = await this.validateUpdateUser(user)
       if (validationError) {
-        return new ValidationError(validationError)
+        return errors.validationError(validationError)
       }
 
       // Find the user by user id from context
-      const userId = getUserIdFromContext()
+      const userId = this.httpContext.getUserIdFromContext()
       logger.info('Updating user with userId: ' + userId)
 
       const existingUser = await User.findByPk(userId)
       if (!existingUser) {
-        return new NotFoundError('User not found')
+        return errors.notFoundError('User not found')
       }
 
       // Update only allowed fields
@@ -77,7 +84,7 @@ class UserService implements IUserService {
 
       // Hash the password if provided
       if (user.password) {
-        const hashedPassword = await crypto.hashPassword(user.password)
+        const hashedPassword = await this.crypto.hashPassword(user.password)
         existingUser.password = hashedPassword
       }
 
@@ -87,22 +94,22 @@ class UserService implements IUserService {
       return Ok(updatedUser.toJSON() as User)
     } catch (error) {
       logger.error(`Error updating user: ${error}`)
-      return new InternalServerError(`Error updating user: ${error}`)
+      return errors.internalServerError(`Error updating user: ${error}`)
     }
   }
 
   async getUser(): Promise<Result<User, Error>> {
     try {
-      const loggedInUser = getUserIdFromContext()
+      const loggedInUser = this.httpContext.getUserIdFromContext()
       logger.info('Fetching user details for userid: ' + loggedInUser)
       const user = await User.findByPk(loggedInUser)
       if (!user) {
-        return new NotFoundError('User not found')
+        return errors.notFoundError('User not found')
       }
       return Ok(user)
     } catch (error) {
       logger.error(`Error fetching user: ${error}`)
-      return new InternalServerError(`Error fetching user: ${error}`)
+      return errors.internalServerError(`Error fetching user: ${error}`)
     }
   }
 
@@ -155,6 +162,6 @@ class UserService implements IUserService {
   }
 }
 
-const userService: IUserService = new UserService()
+const userService: IUserService = new UserService(crypto, httpContext)
 
 export default userService

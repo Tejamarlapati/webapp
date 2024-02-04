@@ -10,9 +10,14 @@ const comparePassword = async (password: string, hashedPassword: string) => {
   return bcrypt.compare(password, hashedPassword)
 }
 
-const crypto = {
+const crypto: ICrypto = {
   hashPassword,
   comparePassword
+}
+
+export interface ICrypto {
+  hashPassword: (password: string) => Promise<string>
+  comparePassword: (password: string, hashedPassword: string) => Promise<boolean>
 }
 
 export default crypto

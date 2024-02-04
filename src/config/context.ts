@@ -1,11 +1,21 @@
-import * as httpContext from 'express-http-context'
+import * as expressHttpContext from 'express-http-context'
 
 export const getUserIdFromContext = () => {
-  return httpContext.get('userid') ?? null
+  return expressHttpContext.get('userid') ?? null
 }
 
 export const setUserIdInContext = (userId: string) => {
-  if (userId) {
-    httpContext.set('userid', userId)
-  }
+  expressHttpContext.set('userid', userId)
 }
+
+export interface IContext {
+  getUserIdFromContext: () => string
+  setUserIdInContext: (userId: string) => void
+}
+
+const httpContext: IContext = {
+  getUserIdFromContext,
+  setUserIdInContext
+}
+
+export default httpContext
