@@ -60,7 +60,7 @@ jobs:
         run: tar -czvf webapp.tar.gz dist
 
       - name: Deploy to Droplet[Dev]
-        if: ${{ startsWith(github.ref, 'refs/heads/a') }}
+        if: ${{ startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')}}
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/droplet.key
