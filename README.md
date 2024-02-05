@@ -1,12 +1,14 @@
 # CSYE6225 Web API Server
 
-A nice project with a nice description
+[![CI](https://github.com/marlapativ/webapp/actions/workflows/ci.yml/badge.svg)](https://github.com/marlapativ/webapp/actions/workflows/ci.yml)
+
+CSYE6225 Web API Server Implementation
 
 ---
 
 ## Requirements
 
-For development, you will only need Node.js and a node global package, Yarn, installed in your environement.
+For development, you will only need Node.js and a node global package, npm, installed in your environement.
 
 ### Node
 
@@ -43,7 +45,7 @@ If you need to update `npm`, you can make it using `npm`! Cool right? After runn
     cd project_folder
     npm install
 
-### Setting up environments
+### Setting up environment
   
   1. You will find a file named `.env.example` on root directory of project.
   2. Create a new file by copying and pasting the file and then renaming it to just `.env`
