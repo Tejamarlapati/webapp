@@ -16,7 +16,7 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted       ## Change to 'ubuntu-latest' to run on GitHub-hosted runners
+    runs-on: ubuntu-latest     
 
     services:
       postgres:
