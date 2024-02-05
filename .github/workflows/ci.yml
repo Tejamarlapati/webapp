@@ -73,14 +73,14 @@ jobs:
             StrictHostKeyChecking no
           END
 
-          scp -i ~/.ssh/droplet.key webapp.tar.gz $SSH_USER@$SSH_HOST:/home/cloud
+          scp -i ~/.ssh/droplet.key webapp.tar.gz $SSH_USER@$SSH_HOST:/home/node
           ssh -i ~/.ssh/droplet.key $SSH_USER@$SSH_HOST "
-            mkdir -p /home/cloud/webapp
-            cd /home/cloud
+            mkdir -p /home/node/webapp
+            cd /home/node
             rm -rf webapp
             cd webapp
-            tar -xvf /home/cloud/webapp.tar.gz
-            pm2 delete server || : && pm2 start /home/cloud/server.js -i 1 --name 'server'
+            tar -xvf /home/node/webapp.tar.gz
+            pm2 delete server || : && pm2 start /home/node/server.js -i 1 --name 'server'
           "
         env:
           SSH_USER: ${{ secrets.DROPLETUSER }}
