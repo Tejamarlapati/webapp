@@ -54,7 +54,12 @@ jobs:
         run: npm test
 
       - name: Build source code
-        run: npm run build 
+        run: npm run build
+
+      - name: Generate .env file
+        run: |
+          cd dist
+          echo "PORT=80" > .env
       
       - name: Archive production artifacts
         run: tar -czf webapp.tar.gz dist
@@ -77,12 +82,13 @@ jobs:
 
           scp -i ~/.ssh/droplet.key webapp.tar.gz $SSH_USER@$SSH_HOST:/home/node
           ssh -i ~/.ssh/droplet.key $SSH_USER@$SSH_HOST "
-            mkdir -p /home/$SSH_USER/webapp
-            cd /home/$SSH_USER
+            pwd
             rm -rf webapp
+            mkdir webapp
             cd webapp
-            tar -xf /home/$SSH_USER/webapp.tar.gz
-            pm2 delete server || : && pm2 start /home/$SSH_USER/server.js -i 1 --name 'server'
+            tar -xf ../webapp.tar.gz
+            cd dist
+            pm2 delete server || : && pm2 start server.js -i 1 --name 'server'
           "
         env:
           SSH_USER: ${{ secrets.DROPLETUSER }}
