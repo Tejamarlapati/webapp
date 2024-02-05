@@ -1,7 +1,4 @@
-# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
-
-name: CI
+name: CI & CD Pipeline
 
 on:
   push:
@@ -56,16 +53,25 @@ jobs:
       - name: Build source code
         run: npm run build
 
-      - name: Generate .env file
+      - name: Generate .env file            # Add variables as required
         run: |
           cd dist
-          echo "PORT=80" > .env
+          echo "PORT=80" > .env     
       
       - name: Archive production artifacts
         run: tar -czf webapp.tar.gz dist
 
-      - name: Deploy to Droplet[Dev]
-        if: ${{ startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')}}
+  deploy:
+    name: Deploy to Droplet [Dev]
+    needs: build
+    runs-on: ubuntu-latest
+    env:
+      SSH_USER: ${{ secrets.DROPLETUSER }}
+      SSH_KEY: ${{ secrets.DROPLETSSHKEY }}
+      SSH_HOST: ${{ secrets.DROPLETIP }}
+    if: ${{ github.event_name == 'push' && needs.build.result == 'success' && (startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')) }}
+    steps:
+      - name: Initialize SSH Key
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/droplet.key
@@ -79,8 +85,13 @@ jobs:
           END
 
           ssh-keyscan $SSH_HOST | tee -a ~/.ssh/known_hosts
-
+      
+      - name: Copy artifacts to Droplet
+        run: |
           scp -i ~/.ssh/droplet.key webapp.tar.gz $SSH_USER@$SSH_HOST:/home/node
+
+      - name: Deploy to Droplet
+        run: |
           ssh -i ~/.ssh/droplet.key $SSH_USER@$SSH_HOST "
             pwd
             rm -rf webapp
@@ -90,7 +101,3 @@ jobs:
             cd dist
             pm2 delete server || : && pm2 start server.js -i 1 --name 'server'
           "
-        env:
-          SSH_USER: ${{ secrets.DROPLETUSER }}
-          SSH_KEY: ${{ secrets.DROPLETSSHKEY }}
-          SSH_HOST: ${{ secrets.DROPLETIP }}
