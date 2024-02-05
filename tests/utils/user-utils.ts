@@ -11,9 +11,14 @@ export const createOrUpdateTestUser = async (username?: string, password?: strin
     user = User.build({
       first_name: 'TJ',
       last_name: 'M',
-      username: 'test@test.com',
+      username: username,
       password: password
     })
   }
   return await user.save()
+}
+
+export const createDefaultUsers = async () => {
+  await createOrUpdateTestUser('test@test.com', '$2a$10$RVHD7EksNzceEezVsMFlCeaa5PYJKGkkiqkQbnC/ezjTIAymuLwui')
+  await createOrUpdateTestUser('integration@test.com', '$2a$10$RVHD7EksNzceEezVsMFlCeaa5PYJKGkkiqkQbnC/ezjTIAymuLwui')
 }

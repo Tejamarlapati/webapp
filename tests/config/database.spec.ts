@@ -2,9 +2,9 @@ import chai from 'chai'
 import database from '../../src/config/database'
 import {
   TEST_DB_CONNECTION_STRING,
-  TEST_DB_ERROR_CONNECTION_STRING,
-  TEST_DB_IN_MEMORY_CONNECTION_STRING,
-  TEST_DB_PROPERTIES,
+  TEST_DB_CONNECTION_STRING_VARIABLES,
+  TEST_DB_ERROR_CONNECTION_STRING_VARIABLES,
+  TEST_DB_VARIABLES,
   resetEnvironmentVariables,
   setEnvironmentVariables
 } from '../utils/env-utils'
@@ -13,17 +13,17 @@ chai.should()
 
 describe('Database Tests', function () {
   this.beforeEach(() => {
-    resetEnvironmentVariables(TEST_DB_CONNECTION_STRING)
-    resetEnvironmentVariables(TEST_DB_PROPERTIES)
+    resetEnvironmentVariables(TEST_DB_CONNECTION_STRING_VARIABLES)
+    resetEnvironmentVariables(TEST_DB_VARIABLES)
   })
 
   it('should throw error on invalid connection string', () => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_ERROR_CONNECTION_STRING)
+    setEnvironmentVariables(TEST_DB_ERROR_CONNECTION_STRING_VARIABLES)
 
     // Act
     try {
-      database.reloadConnectionString()
+      database.updateConnectionString()
 
       // Assert
       chai.assert.fail('Should have thrown error')
@@ -45,8 +45,8 @@ describe('Database Tests', function () {
 
   it('should pick env variable DB_CONN_STRING for connection string', (done) => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_CONNECTION_STRING)
-    database.reloadConnectionString()
+    setEnvironmentVariables(TEST_DB_CONNECTION_STRING_VARIABLES)
+    database.updateConnectionString()
 
     // Act
     const sequelize = database.getDatabaseConnection()
@@ -62,8 +62,8 @@ describe('Database Tests', function () {
 
   it('should pick env variables for connection string', (done) => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_PROPERTIES)
-    database.reloadConnectionString()
+    setEnvironmentVariables(TEST_DB_VARIABLES)
+    database.updateConnectionString()
 
     // Act
     const sequelize = database.getDatabaseConnection()
@@ -79,9 +79,9 @@ describe('Database Tests', function () {
 
   it('should priortize the env variable DB_CONN_STRING for connection string', (done) => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_CONNECTION_STRING)
-    setEnvironmentVariables(TEST_DB_PROPERTIES)
-    database.reloadConnectionString()
+    setEnvironmentVariables(TEST_DB_CONNECTION_STRING_VARIABLES)
+    setEnvironmentVariables(TEST_DB_VARIABLES)
+    database.updateConnectionString()
 
     // Act
     const sequelize = database.getDatabaseConnection()
@@ -96,8 +96,8 @@ describe('Database Tests', function () {
 
   it('should successfully establish sequelize connection', async () => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    database.reloadConnectionString()
+    setEnvironmentVariables(TEST_DB_VARIABLES)
+    database.updateConnectionString()
 
     // Act
     const sequelize = database.getDatabaseConnection()
@@ -112,8 +112,8 @@ describe('Database Tests', function () {
 
   it('should successfully close sequelize connection', async () => {
     // Arrange
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    database.reloadConnectionString()
+    setEnvironmentVariables(TEST_DB_VARIABLES)
+    database.updateConnectionString()
 
     // Act
     const sequelize = database.getDatabaseConnection()
@@ -128,7 +128,9 @@ describe('Database Tests', function () {
   })
 
   this.afterAll(() => {
-    resetEnvironmentVariables(TEST_DB_CONNECTION_STRING)
-    resetEnvironmentVariables(TEST_DB_PROPERTIES)
+    resetEnvironmentVariables(TEST_DB_CONNECTION_STRING_VARIABLES)
+    resetEnvironmentVariables(TEST_DB_VARIABLES)
+    setEnvironmentVariables(TEST_DB_VARIABLES)
+    database.updateConnectionString(TEST_DB_CONNECTION_STRING)
   })
 })

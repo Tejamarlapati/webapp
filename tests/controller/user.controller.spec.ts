@@ -1,9 +1,7 @@
 import chai from 'chai'
 import chaiHTTP from 'chai-http'
 import server from '../../src/server'
-import database from '../../src/config/database'
-import { TEST_DB_IN_MEMORY_CONNECTION_STRING, setEnvironmentVariables } from '../utils/env-utils'
-import { createOrUpdateTestUser } from '../utils/user-utils'
+import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
 
 chai.should()
 chai.use(chaiHTTP)
@@ -14,13 +12,9 @@ const TEST_USER_AUTH_HEADER = 'Basic dGVzdEB0ZXN0LmNvbTpwYXNzd29yZA=='
 const NO_USER_AUTH_HEADER = 'Basic YXNidjphc2RqaW8='
 
 describe('User Controller Tests - /user', function () {
-  const db = database
-
   // Setup the database connection before all tests
   this.beforeAll(() => {
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    db.reloadConnectionString()
-    database.getDatabaseConnection().sync()
+    createDefaultUsers()
   })
 
   it('should return status 405 on /user GET', function (done) {
@@ -217,21 +211,12 @@ describe('User Controller Tests - /user', function () {
   })
 
   after(() => chai.request(server).close())
-
-  // Disconnect the database after all tests
-  this.afterAll(async () => {
-    await database.closeDatabaseConnection()
-  })
 })
 
 describe('User Controller Tests - /self', function () {
-  const db = database
-
   // Setup the database connection before all tests
   this.beforeAll(() => {
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    db.reloadConnectionString()
-    database.getDatabaseConnection().sync()
+    createDefaultUsers()
   })
 
   it('should return status 405 on /user/self POST', function (done) {
@@ -526,9 +511,4 @@ describe('User Controller Tests - /self', function () {
   })
 
   after(() => chai.request(server).close())
-
-  // Disconnect the database after all tests
-  this.afterAll(async () => {
-    await database.closeDatabaseConnection()
-  })
 })

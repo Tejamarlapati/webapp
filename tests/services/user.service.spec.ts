@@ -1,6 +1,4 @@
 import chai from 'chai'
-import database from '../../src/config/database'
-import { setEnvironmentVariables, TEST_DB_IN_MEMORY_CONNECTION_STRING } from '../utils/env-utils'
 import { IUserService, UserService } from '../../src/services/user.service'
 import crypto, { ICrypto } from '../../src/config/crypto'
 import User from '../../src/models/user.model'
@@ -27,11 +25,6 @@ const mockContext: IContext = {
 
 describe('User Service Tests', function () {
   let userService: IUserService
-  this.beforeAll(() => {
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    database.reloadConnectionString()
-    database.getDatabaseConnection().sync()
-  })
 
   this.beforeEach(() => {
     userService = new UserService(crypto, httpContext)
@@ -44,6 +37,7 @@ describe('User Service Tests', function () {
       username: 'email@email.com',
       password: 'password'
     } as User
+    await userService.createUser(user)
     const result = await userService.createUser(user)
     result.ok.should.be.false
     !result.ok && result.error.message.should.equal('User with this username already exists')
@@ -93,10 +87,5 @@ describe('User Service Tests', function () {
     const result = await userService.getUser()
     result.ok.should.be.false
     !result.ok && result.error.message.should.equal('Error fetching user: Error: Error from context')
-  })
-
-  // Disconnect the database after all tests
-  this.afterAll(async () => {
-    await database.closeDatabaseConnection()
   })
 })

@@ -34,7 +34,7 @@ routes(app)
 // Express Server
 app.listen(port, async () => {
   const isDatabaseUp = await healthCheckService.databaseHealthCheck()
-  if (isDatabaseUp) database.getDatabaseConnection().sync({ force: true })
+  if (isDatabaseUp) database.getDatabaseConnection().sync()
   logger.info(`Server listening on port ${port}`)
 })
 

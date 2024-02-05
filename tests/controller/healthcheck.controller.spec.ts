@@ -2,34 +2,15 @@ import chai from 'chai'
 import chaiHTTP from 'chai-http'
 import server from '../../src/server'
 import database from '../../src/config/database'
-import {
-  TEST_DB_CONNECTION_STRING,
-  TEST_DB_IN_MEMORY_CONNECTION_STRING,
-  setEnvironmentVariables
-} from '../utils/env-utils'
+import { TEST_DB_CONNECTION_STRING, TEST_DB_NOT_EXIST_CONNECTION_STRING } from '../utils/env-utils'
 
 chai.should()
 chai.use(chaiHTTP)
 
 describe('Health Check Controller Tests', function () {
-  const db = database
-
-  // Setup the database connection before all tests
-  this.beforeAll(() => {
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    db.reloadConnectionString()
-    database.getDatabaseConnection().sync()
-  })
-
-  this.beforeEach(() => {
-    setEnvironmentVariables(TEST_DB_IN_MEMORY_CONNECTION_STRING)
-    db.reloadConnectionString()
-  })
-
   it('should return status 503 on /healthz GET', function (done) {
     // Mocking invalid data connection
-    setEnvironmentVariables(TEST_DB_CONNECTION_STRING)
-    database.reloadConnectionString()
+    database.updateConnectionString(TEST_DB_NOT_EXIST_CONNECTION_STRING)
 
     chai
       .request(server)
@@ -41,6 +22,8 @@ describe('Health Check Controller Tests', function () {
   })
 
   it('should return status 200 on /healthz GET', function (done) {
+    database.updateConnectionString(TEST_DB_CONNECTION_STRING)
+
     chai
       .request(server)
       .get('/healthz')
@@ -116,10 +99,8 @@ describe('Health Check Controller Tests', function () {
       })
   })
 
-  after(() => chai.request(server).close())
-
-  // Disconnect the database after all tests
-  this.afterAll(async () => {
-    await database.closeDatabaseConnection()
+  after(() => {
+    database.updateConnectionString(TEST_DB_CONNECTION_STRING)
+    chai.request(server).close()
   })
 })

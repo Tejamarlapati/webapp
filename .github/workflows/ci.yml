@@ -1,0 +1,60 @@
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: CI
+
+on:
+  push:
+    branches: 
+      - "main"
+      - "a*"                   ## Not required on org repo
+
+  pull_request:
+    branches: 
+      - "main"
+      - "a*"                   ## Not required on org repo
+
+jobs:
+  build:
+    runs-on: self-hosted       ## Change to 'ubuntu-latest' to run on GitHub-hosted runners
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: Cloud
+          POSTGRES_PASSWORD: cloud
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: cloud
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js 21.6.1
+        uses: actions/setup-node@v4
+        with:
+          node-version: 21.6.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint codebase
+        run: npm run lint
+
+      - name: Execute tests
+        run: npm test
+
+      - name: Build source code
+        run: npm run build 
+      
+      - name: Archive production artifacts
+        run: tar -czvf webapp.tar.gz dist

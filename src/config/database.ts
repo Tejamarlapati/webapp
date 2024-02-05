@@ -5,7 +5,7 @@ import env from './env'
 export interface IDatabase {
   getDatabaseConnection(): Sequelize
   closeDatabaseConnection(): Promise<void>
-  reloadConnectionString(): void
+  updateConnectionString(connectionString?: string): void
 }
 
 class Database implements IDatabase {
@@ -13,7 +13,7 @@ class Database implements IDatabase {
   private _options: Options | undefined = undefined
 
   constructor() {
-    this.reloadConnectionString()
+    this.updateConnectionString()
   }
 
   getDatabaseConnection(): Sequelize {
@@ -24,8 +24,8 @@ class Database implements IDatabase {
     return this._sequelize.close()
   }
 
-  reloadConnectionString(): void {
-    const connectionString = getConnectionString()
+  updateConnectionString(connectionString?: string): void {
+    connectionString ??= getConnectionString()
     this._options = getSequelizeOptions(connectionString)
     this._sequelize = new Sequelize(connectionString, this._options)
   }
@@ -33,7 +33,6 @@ class Database implements IDatabase {
 
 const getSequelizeOptions = (connectionString: string): Options | undefined => {
   if (connectionString.includes('postgres://')) return { dialect: 'postgres', dialectModule: pg }
-  if (connectionString.includes('sqlite')) return { dialect: 'sqlite' }
   return undefined
 }
 
