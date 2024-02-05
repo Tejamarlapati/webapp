@@ -13,8 +13,8 @@ const NO_USER_AUTH_HEADER = 'Basic YXNidjphc2RqaW8='
 
 describe('User Controller Tests - /user', function () {
   // Setup the database connection before all tests
-  this.beforeAll(() => {
-    createDefaultUsers()
+  this.beforeAll(async () => {
+    await createDefaultUsers()
   })
 
   it('should return status 405 on /user GET', function (done) {
@@ -215,8 +215,8 @@ describe('User Controller Tests - /user', function () {
 
 describe('User Controller Tests - /self', function () {
   // Setup the database connection before all tests
-  this.beforeAll(() => {
-    createDefaultUsers()
+  this.beforeEach(async () => {
+    await createDefaultUsers()
   })
 
   it('should return status 405 on /user/self POST', function (done) {
