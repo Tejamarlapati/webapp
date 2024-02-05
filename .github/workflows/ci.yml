@@ -57,7 +57,7 @@ jobs:
         run: npm run build 
       
       - name: Archive production artifacts
-        run: tar -czvf webapp.tar.gz dist
+        run: tar -czf webapp.tar.gz dist
 
       - name: Deploy to Droplet[Dev]
         if: ${{ startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')}}
@@ -77,12 +77,12 @@ jobs:
 
           scp -i ~/.ssh/droplet.key webapp.tar.gz $SSH_USER@$SSH_HOST:/home/node
           ssh -i ~/.ssh/droplet.key $SSH_USER@$SSH_HOST "
-            mkdir -p /home/node/webapp
-            cd /home/node
+            mkdir -p /home/$SSH_USER/webapp
+            cd /home/$SSH_USER
             rm -rf webapp
             cd webapp
-            tar -xvf /home/node/webapp.tar.gz
-            pm2 delete server || : && pm2 start /home/node/server.js -i 1 --name 'server'
+            tar -xf /home/$SSH_USER/webapp.tar.gz
+            pm2 delete server || : && pm2 start /home/$SSH_USER/server.js -i 1 --name 'server'
           "
         env:
           SSH_USER: ${{ secrets.DROPLETUSER }}
