@@ -12,6 +12,12 @@ on:
       - a[0-9]                   # CI on a1-a9 assignment branches
 
 jobs:
+  fail:
+    name: Fail
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fail
+        run: exit 1
   build:
     runs-on: ubuntu-latest     
 
