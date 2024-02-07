@@ -78,6 +78,14 @@ To serve the node application, use the following command
 
 **Note:** Make sure the `.env` file in the dist folder is setup with required properties else the default properties are loaded
 
+To serve the node application using pm2, use the following command
+
+    npm run start:pm2
+
+**Note:** Requires pm2 to be globally installed
+
+    npm i -g pm2
+
 ## Tests
 
 ### Running Test Cases
@@ -94,7 +102,7 @@ To automatically fix lint errors, use the following command
 
     npm run lint:fix
 
-## Database Commands
+## Database Commands - Additional info
 
 ### Stop PostgreSQL database
 
