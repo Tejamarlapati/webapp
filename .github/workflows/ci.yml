@@ -72,7 +72,7 @@ jobs:
 
   # Temporarily disabling the job [Remove the false in 'if' condition]
   deploy:
-    if: false && ${{ needs.build.result == 'success' && github.event_name == 'push' }}
+    if: false
     name: Deploy to Droplet [Dev]
     needs: build
     runs-on: ubuntu-latest
