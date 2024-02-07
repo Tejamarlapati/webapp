@@ -1,10 +1,12 @@
 import { Options, Sequelize } from 'sequelize'
 import * as pg from 'pg'
 import env from './env'
+import logger from './logger'
 
 export interface IDatabase {
   getDatabaseConnection(): Sequelize
   closeDatabaseConnection(): Promise<void>
+  syncDatabase(): Promise<boolean>
   updateConnectionString(connectionString?: string): void
 }
 
@@ -14,6 +16,17 @@ class Database implements IDatabase {
 
   constructor() {
     this.updateConnectionString()
+  }
+
+  async syncDatabase(): Promise<boolean> {
+    try {
+      await this._sequelize.authenticate()
+      await this._sequelize.sync()
+      return true
+    } catch (error) {
+      logger.error(`Error while syncing database. Error: ${error}`)
+      return false
+    }
   }
 
   getDatabaseConnection(): Sequelize {

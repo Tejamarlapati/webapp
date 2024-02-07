@@ -12,7 +12,7 @@
     "start": "NODE_ENV=production pm2 start server --name server",
     "lint": "eslint ./**/*.ts",
     "lint:fix": "eslint ./**/*.ts --fix",
-    "test": "mocha --exit --require ts-node/register --require tests/utils/fixtures.ts",
+    "test": "mocha --exit",
     "test:watch": "mocha --watch",
     "coverage": "nyc --all --reporter=text npm run test",
     "tar": "",
