@@ -201,7 +201,7 @@ describe('User Controller Tests - /user', function () {
       })
   })
 
-  it('should return status 400 on /user POST invalid first_name max length', function (done) {
+  it('should return status 400 on /user POST invalid field account_created', function (done) {
     chai
       .request(server)
       .post('/v1/user')
