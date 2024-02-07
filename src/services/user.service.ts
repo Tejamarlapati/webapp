@@ -115,15 +115,15 @@ export class UserService implements IUserService {
 
   async validateCreateUser(user: User): Promise<string | null> {
     if (!user) return 'User details have to be defined'
-    else if (!validator.isValidString(user.first_name)) return 'First name is required and should be a string'
-    else if (!validator.isValidString(user.last_name)) return 'Last name is required and should be a string'
-    else if (!validator.isValidString(user.password)) return 'Password is required and should be a string'
-    else if (!validator.isValidString(user.username)) return 'email is required and should be a string'
-    else if (!validator.isValidEmail(user.username)) return 'email is invalid'
+    else if (!validator.isValidString(user.first_name)) return 'first_name is required and should be a string'
+    else if (!validator.isValidString(user.last_name)) return 'last_name is required and should be a string'
+    else if (!validator.isValidString(user.password)) return 'password is required and should be a string'
+    else if (!validator.isValidString(user.username)) return 'username is required and should be a string'
+    else if (!validator.isValidEmail(user.username)) return 'username is not a valid email address'
     else if (user.password.length < 8 || user.password.length > 50)
-      return 'Password should be at least 8 and at most 50 characters long'
+      return 'password should be at least 8 and at most 50 characters long'
     else if (user.first_name.length > 100 || user.last_name.length > 100)
-      return 'First name and last name should be at most 100 characters long'
+      return 'first_name and last_name should be at most 100 characters long'
     try {
       const userModel = User.build({
         username: user.username,

@@ -11,7 +11,7 @@ export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: Error, req: Request, res: Response, _: NextFunction) => {
     logger.error(`Error: ${err.message} Request body: ${req.body}`)
-    handleResponse(res, errors.validationError(`${err.message}`))
+    handleResponse(res, errors.validationError('Malformed JSON in request body', true))
   }
 }
 

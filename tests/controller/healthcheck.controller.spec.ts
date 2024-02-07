@@ -101,6 +101,10 @@ describe('Health Check Controller Tests', function () {
 
   after(() => {
     database.updateConnectionString(TEST_DB_CONNECTION_STRING)
+  })
+
+  this.afterAll(() => {
+    database.updateConnectionString(TEST_DB_CONNECTION_STRING)
     chai.request(server).close()
   })
 })

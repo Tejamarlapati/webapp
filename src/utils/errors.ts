@@ -5,22 +5,25 @@ export class HttpStatusError extends Error implements ResultError<HttpStatusErro
   statusCode: number
   ok: false
   error: this
+  ignoreMessage: boolean
 
-  constructor(message: string, statusCode: number) {
+  constructor(message: string, statusCode: number, ignoreMessage: boolean = false) {
     super(message)
     this.statusCode = statusCode
     this.name = 'HttpStatusError'
     this.ok = false
     this.error = this
+    this.ignoreMessage = ignoreMessage
   }
 }
 
 const errors = {
   unAuthorizedError: () => new HttpStatusError('Unauthorized', StatusCodes.UNAUTHORIZED),
-  validationError: (message: string) => new HttpStatusError(message, StatusCodes.BAD_REQUEST),
   notFoundError: (message: string) => new HttpStatusError(message, StatusCodes.NOT_FOUND),
   internalServerError: (message: string) => new HttpStatusError(message, StatusCodes.INTERNAL_SERVER_ERROR),
-  methodNotAllowedError: (message?: string) => new HttpStatusError(message ?? '', StatusCodes.METHOD_NOT_ALLOWED)
+  methodNotAllowedError: (message?: string) => new HttpStatusError(message ?? '', StatusCodes.METHOD_NOT_ALLOWED),
+  validationError: (message: string, ignoreMessage: boolean = false) =>
+    new HttpStatusError(message, StatusCodes.BAD_REQUEST, ignoreMessage)
 }
 
 export default errors

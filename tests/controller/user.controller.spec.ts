@@ -75,7 +75,7 @@ describe('User Controller Tests - /user', function () {
       .send('')
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('Request body cannot be empty')
         done()
       })
   })
@@ -87,7 +87,7 @@ describe('User Controller Tests - /user', function () {
       .send({})
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('Request body cannot be empty')
         done()
       })
   })
@@ -115,7 +115,7 @@ describe('User Controller Tests - /user', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('last_name is required and should be a string')
         done()
       })
   })
@@ -133,7 +133,7 @@ describe('User Controller Tests - /user', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('username is not a valid email address')
         done()
       })
   })
@@ -151,7 +151,7 @@ describe('User Controller Tests - /user', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('first_name is required and should be a string')
         done()
       })
   })
@@ -165,11 +165,11 @@ describe('User Controller Tests - /user', function () {
         first_name: 'TJ',
         last_name: 'TJ',
         username: 'test@test.com',
-        password: 'TJ'
+        password: 'password'
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('User with this username already exists')
         done()
       })
   })
@@ -187,7 +187,7 @@ describe('User Controller Tests - /user', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('Query parameters are not allowed')
         done()
       })
   })
@@ -201,7 +201,7 @@ describe('User Controller Tests - /user', function () {
         first_name: 'TJ',
         last_name: 'TJ',
         username: Date.now() + 'test@test.com',
-        password: 'TJ'
+        password: 'password'
       })
       .end(function (_, res) {
         res.should.have.status(201)
@@ -334,7 +334,7 @@ describe('User Controller Tests - /self', function () {
       .set('AUTHORIZATION', INTEGRATION_USER_AUTH_HEADER)
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.be.have.property('error').eql('Query parameters are not allowed')
         done()
       })
   })
@@ -376,7 +376,7 @@ describe('User Controller Tests - /self', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('Field username cannot be updated')
         done()
       })
   })
@@ -393,7 +393,7 @@ describe('User Controller Tests - /self', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('last_name cannot be empty and should be a string')
         done()
       })
   })
@@ -406,7 +406,7 @@ describe('User Controller Tests - /self', function () {
       .send({})
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('Request body cannot be empty')
         done()
       })
   })
@@ -423,7 +423,7 @@ describe('User Controller Tests - /self', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('first_name cannot be empty and should be a string')
         done()
       })
   })
@@ -440,7 +440,7 @@ describe('User Controller Tests - /self', function () {
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai.expect(res.body).to.be.empty
+        chai.expect(res.body).to.have.property('error').eql('password cannot be empty and should be a string')
         done()
       })
   })
@@ -470,7 +470,9 @@ describe('User Controller Tests - /self', function () {
           chai
             .expect(response)
             .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
-
+          const createdDate = new Date(res.body.account_created)
+          const updatedDate = new Date(res.body.account_updated)
+          chai.expect(updatedDate).to.be.greaterThan(createdDate)
           done()
         })
     })
@@ -493,7 +495,9 @@ describe('User Controller Tests - /self', function () {
           chai
             .expect(response)
             .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
-
+          const createdDate = new Date(res.body.account_created)
+          const updatedDate = new Date(res.body.account_updated)
+          chai.expect(updatedDate).to.be.greaterThan(createdDate)
           done()
         })
     })
@@ -516,11 +520,65 @@ describe('User Controller Tests - /self', function () {
           chai
             .expect(response)
             .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
-
+          const createdDate = new Date(res.body.account_created)
+          const updatedDate = new Date(res.body.account_updated)
+          chai.expect(updatedDate).to.be.greaterThan(createdDate)
           done()
+        })
+    })
+
+    it('should return status 200 on /user/self PUT partial update password', async () => {
+      const new_user = 'usertest@usertest.com'
+      const password = 'password'
+      const new_user_password = 'updatedpassword'
+      const OLD_PASSWORD_AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
+      const NEW_PASSWORD_AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${new_user_password}`).toString('base64')}`
+      await createOrUpdateTestUser(new_user)
+      chai
+        .request(server)
+        .put('/v1/user/self')
+        .set('AUTHORIZATION', OLD_PASSWORD_AUTH_HEADER)
+        .send({
+          password: new_user_password
+        })
+        .then((res) => {
+          res.should.have.status(200)
+          const response = res.body
+          chai.expect(response.username).to.eql(new_user)
+          chai.expect(response).to.not.have.property('password')
+        })
+        .then(function () {
+          // Old password auth header should be unauthorized
+          chai
+            .request(server)
+            .get('/v1/user/self')
+            .set('AUTHORIZATION', OLD_PASSWORD_AUTH_HEADER)
+            .end(function (_, res) {
+              res.should.have.status(401)
+            })
+
+          // New password auth header should have access
+          chai
+            .request(server)
+            .get('/v1/user/self')
+            .set('AUTHORIZATION', NEW_PASSWORD_AUTH_HEADER)
+            .end(function (_, res) {
+              const response = res.body
+              res.should.have.status(200)
+              chai.expect(response.username).to.eql(new_user)
+              chai.expect(response).to.not.have.property('password')
+              chai.expect(response.first_name).to.eql('TJ')
+              chai.expect(response.last_name).to.eql('M')
+              chai
+                .expect(response)
+                .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
+              const createdDate = new Date(res.body.account_created)
+              const updatedDate = new Date(res.body.account_updated)
+              chai.expect(updatedDate).to.be.greaterThan(createdDate)
+            })
         })
     })
   })
 
-  after(() => chai.request(server).close())
+  this.afterAll(() => chai.request(server).close())
 })

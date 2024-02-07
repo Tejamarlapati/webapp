@@ -92,22 +92,21 @@ describe('Health Check Controller Tests', function () {
       })
   })
 
-  it('should return status 404 on / GET', function (done) {
+  it('should return status 404 on / GET', function () {
     chai
       .request(server)
       .get('/')
       .end(function (_, res) {
         res.should.have.status(404)
-        done()
       })
   })
 
   after(() => {
     database.updateConnectionString(TEST_DB_CONNECTION_STRING)
-    chai.request(server).close()
   })
 
   this.afterAll(() => {
     database.updateConnectionString(TEST_DB_CONNECTION_STRING)
+    chai.request(server).close()
   })
 })
