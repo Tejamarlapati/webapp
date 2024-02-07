@@ -125,6 +125,12 @@ export class UserService implements IUserService {
       return 'password should be at least 8 and at most 50 characters long'
     else if (user.first_name.length > 100 || user.last_name.length > 100)
       return 'first_name and last_name should be at most 100 characters long'
+    const allowed_fields = ['first_name', 'last_name', 'password', 'username']
+    for (const field in user) {
+      if (!allowed_fields.includes(field)) {
+        return `Field ${field} cannot be set during user creation`
+      }
+    }
     try {
       const userModel = User.build({
         username: user.username,

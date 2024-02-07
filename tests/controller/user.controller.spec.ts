@@ -186,17 +186,15 @@ describe('User Controller Tests - /user', function () {
       .post('/v1/user')
       .set('Content-Type', 'application/json')
       .send({
-        first_name: 'LENGTHMORETHAN100'.repeat(20),
+        first_name: 'LENGTHMORETHAN100',
         last_name: 'TJ',
         username: 'tj@tj.com',
-        password: 'password'
+        password: 'password',
+        account_created: new Date().toString()
       })
       .end(function (_, res) {
         res.should.have.status(400)
-        chai
-          .expect(res.body)
-          .to.have.property('error')
-          .eql('first_name and last_name should be at most 100 characters long')
+        chai.expect(res.body).to.have.property('error').eql('Field account_created cannot be set during user creation')
         done()
       })
   })
