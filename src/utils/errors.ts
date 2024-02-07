@@ -16,9 +16,11 @@ export class HttpStatusError extends Error implements ResultError<HttpStatusErro
 }
 
 const errors = {
+  unAuthorizedError: () => new HttpStatusError('Unauthorized', StatusCodes.UNAUTHORIZED),
   validationError: (message: string) => new HttpStatusError(message, StatusCodes.BAD_REQUEST),
   notFoundError: (message: string) => new HttpStatusError(message, StatusCodes.NOT_FOUND),
-  internalServerError: (message: string) => new HttpStatusError(message, StatusCodes.INTERNAL_SERVER_ERROR)
+  internalServerError: (message: string) => new HttpStatusError(message, StatusCodes.INTERNAL_SERVER_ERROR),
+  methodNotAllowedError: (message?: string) => new HttpStatusError(message ?? '', StatusCodes.METHOD_NOT_ALLOWED)
 }
 
 export default errors

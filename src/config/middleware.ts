@@ -2,15 +2,16 @@ import { Request, Response, NextFunction } from 'express'
 import auth from 'basic-auth'
 import logger from './logger'
 import crypto from './crypto'
+import errors from '../utils/errors'
 import User from '../models/user.model'
 import { setUserIdInContext } from './context'
-import { StatusCodes } from 'http-status-codes'
+import { handleResponse } from '../utils/response'
 
 export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: Error, req: Request, res: Response, _: NextFunction) => {
     logger.error(`Error: ${err.message} Request body: ${req.body}`)
-    res.status(StatusCodes.BAD_REQUEST).send()
+    handleResponse(res, errors.validationError(`${err.message}`))
   }
 }
 
@@ -25,7 +26,7 @@ export const noQueryParams = () => {
   return (req: Request, res: Response, next: NextFunction) => {
     const areQueryParamsPresent = req.query && Object.keys(req.query).length > 0
     if (areQueryParamsPresent) {
-      res.status(StatusCodes.BAD_REQUEST).send()
+      handleResponse(res, errors.validationError('Query parameters are not allowed'))
       return
     }
     next()
@@ -38,7 +39,7 @@ export const authorized = () => {
     const result = auth(req)
     if (!result) {
       logger.info('User is not authorized')
-      res.status(401).send()
+      handleResponse(res, errors.unAuthorizedError())
       return
     }
 
@@ -46,14 +47,14 @@ export const authorized = () => {
     const user = await User.scope(['withPassword']).findOne({ where: { username } })
     if (!user) {
       logger.info(`Cannot find user. User: ${result!.name}`)
-      res.status(401).send()
+      handleResponse(res, errors.unAuthorizedError())
       return
     }
 
     const isPasswordMatch = await crypto.comparePassword(result!.pass, user!.password)
     if (!isPasswordMatch) {
       logger.info(`Password mismatch. User: ${result!.name}`)
-      res.status(401).send()
+      handleResponse(res, errors.unAuthorizedError())
       return
     }
 

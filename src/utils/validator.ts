@@ -2,18 +2,22 @@ const isNullOrUndefined = (data: unknown) => {
   return data === null || data === undefined
 }
 
-const isEmpty = (data: string) => {
-  return isNullOrUndefined(data) || data.trim() === ''
+const isInvalidString = (data: unknown) => {
+  return isNullOrUndefined(data) || typeof data !== 'string'
+}
+
+const isValidString = (data: unknown) => {
+  return !isInvalidString(data) && (data as string).trim().length > 0
 }
 
 const isValidEmail = (data: string) => {
-  return !isEmpty(data) && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data)
+  return isValidString(data) && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data)
 }
 
 const validator = {
   isNullOrUndefined,
-  isEmpty,
-  isValidEmail
+  isValidEmail,
+  isValidString
 }
 
 export default validator

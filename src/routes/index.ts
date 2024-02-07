@@ -1,9 +1,10 @@
 import { Application } from 'express'
 import healthCheckController from '../controller/healthcheck.controller'
-import { StatusCodes } from 'http-status-codes'
 import nocache from 'nocache'
 import { noCachePragma } from '../config/middleware'
 import userController from '../controller/user.controller'
+import { handleResponse } from '../utils/response'
+import errors from '../utils/errors'
 
 const routes = (app: Application) => {
   // Health Check route
@@ -14,7 +15,7 @@ const routes = (app: Application) => {
 
   // Default fallback route
   app.route('*').all((_, res) => {
-    res.status(StatusCodes.NOT_FOUND).send()
+    handleResponse(res, errors.notFoundError('404 Not Found'))
   })
 }
 

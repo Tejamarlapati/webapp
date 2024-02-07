@@ -4,6 +4,7 @@ import userService from '../services/user.service'
 import User from '../models/user.model'
 import { handleResponse } from '../utils/response'
 import { authorized, noQueryParams } from '../config/middleware'
+import errors from '../utils/errors'
 
 const userController: Router = express.Router()
 const userSelfController: Router = express.Router()
@@ -15,7 +16,7 @@ userController
   .post('/', noQueryParams(), async (req, res) => {
     // Validating request body
     if (Object.keys(req.body).length === 0) {
-      res.status(StatusCodes.BAD_REQUEST).send()
+      handleResponse(res, errors.validationError('Request body cannot be empty'))
       return
     }
 
@@ -25,7 +26,7 @@ userController
     handleResponse(res, response, StatusCodes.CREATED)
   })
   .all('/', (_, res) => {
-    res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
+    handleResponse(res, errors.methodNotAllowedError())
   })
 
 // "v1/user/self" routes
@@ -37,7 +38,7 @@ userSelfController
   .put('/', authorized(), noQueryParams(), async (req, res) => {
     // Validating request body
     if (Object.keys(req.body).length === 0) {
-      res.status(StatusCodes.BAD_REQUEST).send()
+      handleResponse(res, errors.validationError('Request body cannot be empty'))
       return
     }
 
@@ -47,7 +48,7 @@ userSelfController
     handleResponse(res, response)
   })
   .all('/', (_, res) => {
-    res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
+    handleResponse(res, errors.methodNotAllowedError())
   })
 
 export default userController

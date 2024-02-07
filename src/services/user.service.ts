@@ -115,12 +115,15 @@ export class UserService implements IUserService {
 
   async validateCreateUser(user: User): Promise<string | null> {
     if (!user) return 'User details have to be defined'
-    else if (validator.isEmpty(user.first_name)) return 'First name is required'
-    else if (validator.isEmpty(user.last_name)) return 'Last name is required'
-    else if (validator.isEmpty(user.password)) return 'Password is required'
-    else if (validator.isEmpty(user.username)) return 'email is required'
+    else if (!validator.isValidString(user.first_name)) return 'First name is required and should be a string'
+    else if (!validator.isValidString(user.last_name)) return 'Last name is required and should be a string'
+    else if (!validator.isValidString(user.password)) return 'Password is required and should be a string'
+    else if (!validator.isValidString(user.username)) return 'email is required and should be a string'
     else if (!validator.isValidEmail(user.username)) return 'email is invalid'
-
+    else if (user.password.length < 8 || user.password.length > 50)
+      return 'Password should be at least 8 and at most 50 characters long'
+    else if (user.first_name.length > 100 || user.last_name.length > 100)
+      return 'First name and last name should be at most 100 characters long'
     try {
       const userModel = User.build({
         username: user.username,
@@ -145,10 +148,16 @@ export class UserService implements IUserService {
         return `Field ${field} cannot be updated`
       }
       const value = user[field as keyof User] as string
-      if (validator.isEmpty(value)) {
-        return `${field} cannot be empty`
+      if (!validator.isValidString(value)) {
+        return `${field} cannot be empty and should be a string`
       }
-
+      if (field === 'first_name' || field === 'last_name') {
+        if (value.length > 100) {
+          return `${field} should be at most 100 characters long`
+        }
+      }
+      if (field === 'password' && (value.length < 8 || value.length > 50))
+        return 'Password should be at least 8 and at most 50 characters long'
       update[field] = value
     }
 
