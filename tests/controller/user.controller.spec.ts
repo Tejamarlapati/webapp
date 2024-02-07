@@ -186,6 +186,27 @@ describe('User Controller Tests - /user', function () {
       .post('/v1/user')
       .set('Content-Type', 'application/json')
       .send({
+        first_name: 'LENGTHMORETHAN100'.repeat(20),
+        last_name: 'TJ',
+        username: 'tj@tj.com',
+        password: 'password'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai
+          .expect(res.body)
+          .to.have.property('error')
+          .eql('first_name and last_name should be at most 100 characters long')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user POST invalid first_name max length', function (done) {
+    chai
+      .request(server)
+      .post('/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({
         first_name: 'LENGTHMORETHAN100',
         last_name: 'TJ',
         username: 'tj@tj.com',
