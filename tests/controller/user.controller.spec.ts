@@ -120,7 +120,7 @@ describe('User Controller Tests - /user', function () {
       })
   })
 
-  it('should return status 400 on /user POST invalid data 1', function (done) {
+  it('should return status 400 on /user POST invalid username', function (done) {
     chai
       .request(server)
       .post('/v1/user')
@@ -138,7 +138,70 @@ describe('User Controller Tests - /user', function () {
       })
   })
 
-  it('should return status 400 on /user POST invalid data 2', function (done) {
+  it('should return status 400 on /user POST invalid password 1', function (done) {
+    chai
+      .request(server)
+      .post('/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({
+        first_name: 'TJ',
+        last_name: 'TJ',
+        username: 'tj@tj.com',
+        password: 'pass'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai
+          .expect(res.body)
+          .to.have.property('error')
+          .eql('password should be at least 8 and at most 50 characters long')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user POST invalid password 2', function (done) {
+    chai
+      .request(server)
+      .post('/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({
+        first_name: 'TJ',
+        last_name: 'TJ',
+        username: 'tj@tj.com',
+        password: 'pass'.repeat(20)
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai
+          .expect(res.body)
+          .to.have.property('error')
+          .eql('password should be at least 8 and at most 50 characters long')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user POST invalid first_name max length', function (done) {
+    chai
+      .request(server)
+      .post('/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({
+        first_name: 'LENGTHMORETHAN100'.repeat(20),
+        last_name: 'TJ',
+        username: 'tj@tj.com',
+        password: 'password'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai
+          .expect(res.body)
+          .to.have.property('error')
+          .eql('first_name and last_name should be at most 100 characters long')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user POST invalid data', function (done) {
     chai
       .request(server)
       .post('/v1/user')
@@ -192,6 +255,25 @@ describe('User Controller Tests - /user', function () {
       })
   })
 
+  it('should return status 400 on /user POST with id', function (done) {
+    chai
+      .request(server)
+      .post('/v1/user')
+      .set('Content-Type', 'application/json')
+      .send({
+        id: '123',
+        first_name: 'TJ',
+        last_name: 'TJ',
+        username: Date.now() + 'test@test.com',
+        password: 'password'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai.expect(res.body).to.have.property('error').eql('id is not allowed')
+        done()
+      })
+  })
+
   it('should return status 201 on /user POST', function (done) {
     chai
       .request(server)
@@ -213,6 +295,10 @@ describe('User Controller Tests - /user', function () {
         chai
           .expect(response)
           .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
+        const createdDate = new Date(res.body.account_created)
+        const updatedDate = new Date(res.body.account_updated)
+        chai.expect(createdDate.getTime()).to.be.closeTo(new Date().getTime(), 1000)
+        chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
         done()
       })
   })
@@ -339,6 +425,19 @@ describe('User Controller Tests - /self', function () {
       })
   })
 
+  it('should return status 400 on /user/self GET with body', function (done) {
+    chai
+      .request(server)
+      .get('/v1/user/self')
+      .set('AUTHORIZATION', INTEGRATION_USER_AUTH_HEADER)
+      .send({ id: 'TJ' })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai.expect(res.body).to.be.have.property('error').eql('Request body should be empty')
+        done()
+      })
+  })
+
   it('should return status 400 on /user/self GET with no user in db', function (done) {
     chai
       .request(server)
@@ -441,6 +540,61 @@ describe('User Controller Tests - /self', function () {
       .end(function (_, res) {
         res.should.have.status(400)
         chai.expect(res.body).to.have.property('error').eql('password cannot be empty and should be a string')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user/self PUT send id', function (done) {
+    chai
+      .request(server)
+      .put('/v1/user/self')
+      .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
+      .send({
+        id: '12',
+        first_name: '',
+        last_name: 'PUT',
+        password: 'password'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai.expect(res.body).to.have.property('error').eql('Field id cannot be updated')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user/self PUT send invalid first_name', function (done) {
+    chai
+      .request(server)
+      .put('/v1/user/self')
+      .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
+      .send({
+        first_name: 'VERYLONGNAME100'.repeat(20),
+        last_name: 'PUT',
+        password: 'password'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai.expect(res.body).to.have.property('error').eql('first_name should be at most 100 characters long')
+        done()
+      })
+  })
+
+  it('should return status 400 on /user/self PUT send invalid password', function (done) {
+    chai
+      .request(server)
+      .put('/v1/user/self')
+      .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
+      .send({
+        first_name: 'TESTTT',
+        last_name: 'PUT',
+        password: 'pass'
+      })
+      .end(function (_, res) {
+        res.should.have.status(400)
+        chai
+          .expect(res.body)
+          .to.have.property('error')
+          .eql('Password should be at least 8 and at most 50 characters long')
         done()
       })
   })

@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes'
 import userService from '../services/user.service'
 import User from '../models/user.model'
 import { handleResponse } from '../utils/response'
-import { authorized, noQueryParams } from '../config/middleware'
+import { authorized, dbHealthCheck, noQueryParams } from '../config/middleware'
 import errors from '../utils/errors'
 
 const userController: Router = express.Router()
@@ -13,7 +13,7 @@ const userSelfController: Router = express.Router()
 userController
   // Authorized self routes
   .use('/self', userSelfController)
-  .post('/', noQueryParams(), async (req, res) => {
+  .post('/', noQueryParams(), dbHealthCheck(), async (req, res) => {
     // Validating request body
     if (Object.keys(req.body).length === 0) {
       handleResponse(res, errors.validationError('Request body cannot be empty'))
@@ -31,11 +31,16 @@ userController
 
 // "v1/user/self" routes
 userSelfController
-  .get('/', authorized(), noQueryParams(), async (_, res) => {
+  .get('/', dbHealthCheck(), authorized(), noQueryParams(), async (req, res) => {
+    if (Object.keys(req.body).length > 0) {
+      handleResponse(res, errors.validationError('Request body should be empty'))
+      return
+    }
+
     const response = await userService.getUser()
     handleResponse(res, response)
   })
-  .put('/', authorized(), noQueryParams(), async (req, res) => {
+  .put('/', dbHealthCheck(), authorized(), noQueryParams(), async (req, res) => {
     // Validating request body
     if (Object.keys(req.body).length === 0) {
       handleResponse(res, errors.validationError('Request body cannot be empty'))

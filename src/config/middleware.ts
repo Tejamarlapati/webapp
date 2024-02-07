@@ -6,12 +6,24 @@ import errors from '../utils/errors'
 import User from '../models/user.model'
 import { setUserIdInContext } from './context'
 import { handleResponse } from '../utils/response'
+import healthCheckService from '../services/healthcheck.service'
 
 export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: Error, req: Request, res: Response, _: NextFunction) => {
     logger.error(`Error: ${err.message} Request body: ${req.body}`)
     handleResponse(res, errors.validationError('Malformed JSON in request body', true))
+  }
+}
+
+export const dbHealthCheck = () => {
+  return async (_: Request, res: Response, next: NextFunction) => {
+    const isHealthy = await healthCheckService.databaseHealthCheck()
+    if (!isHealthy) {
+      handleResponse(res, errors.serviceUnavailableError('Database is not healthy'))
+      return
+    }
+    next()
   }
 }
 

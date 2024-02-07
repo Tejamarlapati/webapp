@@ -4,6 +4,7 @@ import {
   TEST_DB_CONNECTION_STRING,
   TEST_DB_CONNECTION_STRING_VARIABLES,
   TEST_DB_ERROR_CONNECTION_STRING_VARIABLES,
+  TEST_DB_NOT_EXIST_CONNECTION_STRING,
   TEST_DB_VARIABLES,
   resetEnvironmentVariables,
   setEnvironmentVariables
@@ -28,6 +29,20 @@ describe('Database Tests', function () {
       // Assert
       chai.assert.fail('Should have thrown error')
     } catch (_) {}
+  })
+
+  it('should throw error on invalid connection string sync', async () => {
+    // Act
+    try {
+      database.updateConnectionString(TEST_DB_NOT_EXIST_CONNECTION_STRING)
+      const result = await database.syncDatabase()
+      chai.expect(result).equal(false)
+    } catch (_) {
+      // Assert
+      chai.assert.fail('Should have thrown error')
+    } finally {
+      database.updateConnectionString()
+    }
   })
 
   it('should have defaults for connection string', (done) => {

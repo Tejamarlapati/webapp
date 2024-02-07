@@ -115,6 +115,7 @@ export class UserService implements IUserService {
 
   async validateCreateUser(user: User): Promise<string | null> {
     if (!user) return 'User details have to be defined'
+    else if (!validator.isNullOrUndefined(user.id)) return 'id is not allowed'
     else if (!validator.isValidString(user.first_name)) return 'first_name is required and should be a string'
     else if (!validator.isValidString(user.last_name)) return 'last_name is required and should be a string'
     else if (!validator.isValidString(user.password)) return 'password is required and should be a string'
