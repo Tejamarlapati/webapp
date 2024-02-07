@@ -8,7 +8,6 @@ import routes from './routes/index'
 import logger from './config/logger'
 import database from './config/database'
 import { jsonErrorHandler } from './config/middleware'
-import healthCheckService from './services/healthcheck.service'
 
 // Setup .env file
 env.loadEnv()
@@ -33,8 +32,8 @@ routes(app)
 
 // Express Server
 app.listen(port, async () => {
-  const isDatabaseUp = await healthCheckService.databaseHealthCheck()
-  if (isDatabaseUp) database.getDatabaseConnection().sync()
+  const result = await database.syncDatabase()
+  logger.info(`Database sync result: ${result}`)
   logger.info(`Server listening on port ${port}`)
 })
 
