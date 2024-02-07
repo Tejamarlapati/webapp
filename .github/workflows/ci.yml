@@ -4,7 +4,6 @@ on:
   push:
     branches: 
       - main
-      - a[0-9]                   # CI on a1-a9 assignment branches
 
   pull_request:
     branches: 
@@ -32,8 +31,6 @@ jobs:
           - 5432:5432
 
     steps:
-      - name: Fail
-        run: exit 1
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -56,15 +53,15 @@ jobs:
         run: npm run build
 
       - name: Generate .env file            # Add variables as required
-        if: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')) }}
+        if: ${{ github.event_name == 'push' }}
         run: echo "PORT=80" > dist/.env   
       
       - name: Archive production artifacts
-        if: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')) }}
+        if: ${{ github.event_name == 'push' }}
         run: tar -czf webapp.tar.gz dist
 
       - name: Upload Artifacts
-        if: ${{ github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')) }}
+        if: ${{ github.event_name == 'push' }}
         uses: actions/upload-artifact@v4
         with:
           name: webapp
@@ -81,7 +78,7 @@ jobs:
       SSH_USER: ${{ secrets.DROPLETUSER }}
       SSH_KEY: ${{ secrets.DROPLETSSHKEY }}
       SSH_HOST: ${{ secrets.DROPLETIP }}
-    if: ${{ needs.build.result == 'success' && github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/a') || startsWith(github.base_ref, 'a')) }}
+    if: ${{ needs.build.result == 'success' && github.event_name == 'push' }}
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
