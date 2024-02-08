@@ -13,6 +13,9 @@ const userSelfController: Router = express.Router()
 userController
   // Authorized self routes
   .use('/self', userSelfController)
+  .head('/', (_, res) => {
+    res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
+  })
   .post('/', noQueryParams(), dbHealthCheck(), async (req, res) => {
     // Validating request body
     if (Object.keys(req.body).length === 0) {
@@ -31,6 +34,9 @@ userController
 
 // "v1/user/self" routes
 userSelfController
+  .head('/', (_, res) => {
+    res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
+  })
   .get('/', dbHealthCheck(), authorized(), noQueryParams(), async (req, res) => {
     if (Object.keys(req.body).length > 0) {
       handleResponse(res, errors.validationError('Request body should be empty'))

@@ -5,6 +5,9 @@ import { StatusCodes } from 'http-status-codes'
 const healthCheckController: Router = express.Router()
 
 healthCheckController
+  .head('/', (_, res) => {
+    res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
+  })
   .get('/', async (req, res) => {
     const isBodyPresent = Object.keys(req.body).length > 0
     const areQueryParamsPresent = req.query && Object.keys(req.query).length > 0
