@@ -24,7 +24,11 @@ app.use(express.json())
 app.use(jsonErrorHandler())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.text({ type: 'text/*' }))
-app.use(cors())
+app.use(
+  cors({
+    optionsSuccessStatus: 405
+  })
+)
 app.use(helmet.noSniff())
 
 // Setup routes
