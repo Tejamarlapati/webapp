@@ -1,4 +1,4 @@
-# CSYE6225 Web API Server
+# EDITING README CSYE6225 Web API Server
 
 [![CI](https://github.com/marlapativ/webapp/actions/workflows/ci.yml/badge.svg)](https://github.com/marlapativ/webapp/actions/workflows/ci.yml)
 
