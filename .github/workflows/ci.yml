@@ -18,14 +18,9 @@ jobs:
       - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
         run: |
           sudo service postgresql start
-          path_to_hba=$(sudo -u postgres psql -t -P format=unaligned -c 'show hba_file';)
-          sudo sed -i '1 i host    all             all             127.0.0.1/32            password' "$path_to_hba"
-          sudo sed -i '1 i host    all             all             ::1/128                 password' "$path_to_hba"
-          sudo service postgresql restart
-          sudo -u postgres psql -c "CREATE DATABASE Cloud;"
-          sudo -u postgres psql -c "CREATE USER cloud WITH PASSWORD 'cloud';"
-          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE Cloud TO cloud;"
-          sudo -u postgres psql -d "postgresql://cloud:cloud@localhost/Cloud" -c "select now()"
+          sudo -u postgres psql -c 'CREATE DATABASE "Cloud";'
+          sudo -u postgres psql -c 'CREATE USER cloud WITH PASSWORD "cloud";'
+          sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE "Cloud" TO cloud;'
 
       - name: Checkout repository
         uses: actions/checkout@v4
