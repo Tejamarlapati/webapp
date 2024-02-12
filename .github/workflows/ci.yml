@@ -17,9 +17,9 @@ jobs:
     steps:
       - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
         env:
-          DB_NAME: ${{ secrets.GITHUB_TOKEN }}
-          DB_USER: Mona
-          DB_PASSWORD: Octocat
+          DB_NAME: ${{ secrets.DB_NAME }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: |
           sudo service postgresql start
           sudo -u postgres psql -c 'CREATE DATABASE "'$DB_NAME'";'
