@@ -17,8 +17,9 @@ jobs:
     steps:
       - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
         run: |
-          sed -i '1 i host    all             all             127.0.0.1/32            password' "/var/lib/pgsql/data/pg_hba.conf"
-          sed -i '1 i host    all             all             ::1/128                 password' "/var/lib/pgsql/data/pg_hba.conf"
+          path_to_hba=$(sudo -u postgres psql -t -P format=unaligned -c 'show hba_file';)
+          sed -i '1 i host    all             all             127.0.0.1/32            password' "$path_to_hba"
+          sed -i '1 i host    all             all             ::1/128                 password' "$path_to_hba"
           sudo service postgresql start
           sudo -u postgres psql -c "CREATE DATABASE Cloud;"
           sudo -u postgres psql -c "CREATE USER cloud WITH PASSWORD 'cloud';"
