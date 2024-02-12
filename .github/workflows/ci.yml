@@ -14,23 +14,14 @@ jobs:
   build:
     runs-on: ubuntu-latest     
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_DB: Cloud
-          POSTGRES_PASSWORD: cloud
-          POSTGRES_PORT: 5432
-          POSTGRES_USER: cloud
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
-
     steps:
+      - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
+        run: |
+          sudo service postgresql start
+          sudo -u postgres psql -c "CREATE DATABASE Cloud;"
+          sudo -u postgres psql -c "CREATE USER cloud WITH PASSWORD 'cloud';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE Cloud TO cloud;"
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -70,7 +61,7 @@ jobs:
           if-no-files-found: error
           overwrite: true
 
-  # Temporarily disabling the job [Remove the false in 'if' condition]
+  # Temporarily disabling the job [Remove the false in 'if' condition to ${{ github.event_name == 'push' }}]
   deploy:
     if: false
     name: Deploy to Droplet [Dev]
