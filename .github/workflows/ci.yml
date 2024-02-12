@@ -16,12 +16,15 @@ jobs:
 
     steps:
       - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
+        env:
+          DB_NAME: ${{ secrets.GITHUB_TOKEN }}
+          DB_USER: Mona
+          DB_PASSWORD: Octocat
         run: |
           sudo service postgresql start
-          sudo -u postgres psql -c 'CREATE DATABASE "Cloud";'
-          sudo -u postgres psql -c "CREATE USER cloud WITH PASSWORD 'cloud';"
-          sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE "Cloud" TO cloud;'
-          sudo -u postgres psql -d "postgresql://cloud:cloud@localhost/Cloud" -c "select now()"
+          sudo -u postgres psql -c 'CREATE DATABASE "'$DB_NAME'";'
+          sudo -u postgres psql -c "CREATE USER "$DB_USER" WITH PASSWORD '"$DB_PASSWORD"';"
+          sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE "'$DB_NAME'" TO '$DB_USER';'
 
       - name: Checkout repository
         uses: actions/checkout@v4
