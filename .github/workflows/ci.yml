@@ -19,8 +19,8 @@ jobs:
         run: |
           sudo service postgresql start
           sudo -u postgres psql -c 'CREATE DATABASE "Cloud";'
-          sudo -u postgres psql -c 'CREATE USER cloud WITH PASSWORD "cloud";'
-          sudo -u postgres psql -c 'GRANT ALL PRIVILEGES ON DATABASE Cloud TO cloud;'
+          sudo -u postgres psql -c "CREATE USER cloud WITH PASSWORD 'cloud';"
+          sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE Cloud TO cloud;"
           sudo -u postgres psql -d "postgresql://cloud:cloud@localhost/Cloud" -c "select now()"
 
       - name: Checkout repository
