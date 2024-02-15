@@ -2,6 +2,9 @@ import express, { Router } from 'express'
 import healthCheckService from '../services/healthcheck.service'
 import { StatusCodes } from 'http-status-codes'
 
+/**
+ * The health check controller
+ */
 const healthCheckController: Router = express.Router()
 
 healthCheckController

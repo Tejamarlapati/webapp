@@ -3,13 +3,36 @@ import * as pg from 'pg'
 import env from './env'
 import logger from './logger'
 
+/**
+ * Interface for Database class
+ */
 export interface IDatabase {
+  /**
+   * Get the database connection
+   * @returns the sequelize database connection
+   */
   getDatabaseConnection(): Sequelize
+
+  /**
+   * Close the database connection
+   */
   closeDatabaseConnection(): Promise<void>
+
+  /**
+   * Sync the database
+   */
   syncDatabase(): Promise<boolean>
+
+  /**
+   * Update the connection string
+   * @param connectionString the connection string to update
+   */
   updateConnectionString(connectionString?: string): void
 }
 
+/**
+ * The Database class
+ */
 class Database implements IDatabase {
   private _sequelize: Sequelize
   private _options: Options | undefined = undefined
@@ -44,11 +67,20 @@ class Database implements IDatabase {
   }
 }
 
+/**
+ * Get the sequelize options
+ * @param connectionString the connection string to get the options for
+ * @returns the sequelize options
+ */
 const getSequelizeOptions = (connectionString: string): Options | undefined => {
   if (connectionString.includes('postgres://')) return { dialect: 'postgres', dialectModule: pg }
   return undefined
 }
 
+/**
+ * Get the connection string from environment variables
+ * @returns the connection string
+ */
 const getConnectionString = (): string => {
   const connectionString = env.getOrDefault('DB_CONN_STRING', '')
   if (connectionString !== '') return connectionString
@@ -57,6 +89,10 @@ const getConnectionString = (): string => {
   return getPostgresConnectionString()
 }
 
+/**
+ * Read the environment variables and get the Postgres connection string
+ * @returns the Postgres connection string
+ */
 const getPostgresConnectionString = (): string => {
   const host = env.getOrDefault('DB_HOST', 'localhost')
   const port = env.getOrDefault('DB_PORT', '5432')

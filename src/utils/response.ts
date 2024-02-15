@@ -3,6 +3,11 @@ import { HttpStatusError } from './errors'
 import { Result, ResultError } from './result'
 import { Response } from 'express'
 
+/**
+ * Handle error response
+ * @param res Response object
+ * @param data error data
+ */
 const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E>) => {
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR
   if (data && data.error instanceof HttpStatusError) {
@@ -16,7 +21,13 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
   }
   res.status(statusCode).send()
 }
-// .status(getStatusCode(data)).json({ error: data.error.message }
+
+/**
+ * Handles valid and error response
+ * @param res Response object
+ * @param data data to be sent
+ * @param statusCode non-default status code to be sent
+ */
 export const handleResponse = <T, E extends Error>(
   res: Response,
   data: Result<T, E>,

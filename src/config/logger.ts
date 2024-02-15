@@ -25,6 +25,9 @@ const transports = [
   new winston.transports.File({ filename: `${logFolder}/${logFileName}`, level: defaultLogLevel })
 ]
 
+/**
+ * The logger
+ */
 const logger = winston.createLogger({
   levels: logLevels,
   level: defaultLogLevel,

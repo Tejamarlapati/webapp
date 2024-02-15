@@ -6,6 +6,10 @@ import userController from '../controller/user.controller'
 import { handleResponse } from '../utils/response'
 import errors from '../utils/errors'
 
+/**
+ * The routes
+ * @param app the express application
+ */
 const routes = (app: Application) => {
   // Health Check route
   app.use('/healthz', nocache(), noCachePragma(), healthCheckController)

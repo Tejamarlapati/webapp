@@ -14,6 +14,9 @@ const isValidEmail = (data: string) => {
   return isValidString(data) && /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(data)
 }
 
+/**
+ * The validator
+ */
 const validator = {
   isNullOrUndefined,
   isValidEmail,

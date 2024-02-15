@@ -8,6 +8,10 @@ import { setUserIdInContext } from './context'
 import { handleResponse } from '../utils/response'
 import healthCheckService from '../services/healthcheck.service'
 
+/**
+ * Middleware to handle invalid json request
+ * @returns a middleware that logs an error request
+ */
 export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: Error, req: Request, res: Response, _: NextFunction) => {
@@ -16,6 +20,10 @@ export const jsonErrorHandler = () => {
   }
 }
 
+/**
+ * Middleware to handle if the database is not healthy
+ * @returns a middleware that checks if the database is healthy
+ */
 export const dbHealthCheck = () => {
   return async (_: Request, res: Response, next: NextFunction) => {
     const isHealthy = await healthCheckService.databaseHealthCheck()
@@ -27,6 +35,10 @@ export const dbHealthCheck = () => {
   }
 }
 
+/**
+ * Middleware to handle no cache pragma
+ * @returns a middleware that sets no cache pragma
+ */
 export const noCachePragma = () => {
   return (_: Request, res: Response, next: NextFunction) => {
     res.setHeader('Pragma', 'no-cache')
@@ -34,6 +46,10 @@ export const noCachePragma = () => {
   }
 }
 
+/**
+ * Middleware to handle no query params
+ * @returns a middleware that checks if the request has no query parameters
+ */
 export const noQueryParams = () => {
   return (req: Request, res: Response, next: NextFunction) => {
     const areQueryParamsPresent = req.query && Object.keys(req.query).length > 0
@@ -45,6 +61,10 @@ export const noQueryParams = () => {
   }
 }
 
+/**
+ * Middleware to handle if the user is authorized
+ * @returns a middleware that checks if the user is authorized
+ */
 export const authorized = () => {
   return async (req: Request, res: Response, next: NextFunction) => {
     logger.info('Checking if user is authorized')

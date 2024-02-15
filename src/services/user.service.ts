@@ -6,12 +6,34 @@ import errors from '../utils/errors'
 import crypto, { ICrypto } from '../config/crypto'
 import httpContext, { IContext } from '../config/context'
 
+/**
+ * The user service interface
+ */
 export interface IUserService {
+  /**
+   * Create a user
+   * @param user the user to create
+   * @returns the created user or error
+   */
   createUser(user: User): Promise<Result<User, Error>>
+
+  /**
+   * Update a user
+   * @param user the user to update
+   * @returns the updated user or error
+   */
   updateUser(user: User): Promise<Result<User, Error>>
+
+  /**
+   * Get the user
+   * @returns the user or error
+   */
   getUser(): Promise<Result<User, Error>>
 }
 
+/**
+ * The user service
+ */
 export class UserService implements IUserService {
   crypto: ICrypto
   httpContext: IContext
@@ -178,6 +200,9 @@ export class UserService implements IUserService {
   }
 }
 
+/**
+ * The user service instance
+ */
 const userService: IUserService = new UserService(crypto, httpContext)
 
 export default userService

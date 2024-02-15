@@ -1,6 +1,9 @@
 import { StatusCodes } from 'http-status-codes'
 import { ResultError } from './result'
 
+/**
+ * The HTTP status error
+ */
 export class HttpStatusError extends Error implements ResultError<HttpStatusError> {
   statusCode: number
   ok: false
@@ -17,6 +20,9 @@ export class HttpStatusError extends Error implements ResultError<HttpStatusErro
   }
 }
 
+/**
+ * The errors
+ */
 const errors = {
   unAuthorizedError: () => new HttpStatusError('Unauthorized', StatusCodes.UNAUTHORIZED),
   serviceUnavailableError: (message: string) => new HttpStatusError(message, StatusCodes.SERVICE_UNAVAILABLE),

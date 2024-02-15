@@ -6,7 +6,14 @@ import { handleResponse } from '../utils/response'
 import { authorized, dbHealthCheck, noQueryParams } from '../config/middleware'
 import errors from '../utils/errors'
 
+/**
+ * The user controller
+ */
 const userController: Router = express.Router()
+
+/**
+ * The user self controller
+ */
 const userSelfController: Router = express.Router()
 
 // "v1/user" routes

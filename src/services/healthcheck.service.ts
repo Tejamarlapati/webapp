@@ -1,7 +1,14 @@
 import database, { IDatabase } from '../config/database'
 import logger from '../config/logger'
 
+/**
+ * Health check service interface
+ */
 interface IHealthCheckService {
+  /**
+   * Database health check
+   * @returns a promise that resolves to true if the database is healthy, false otherwise
+   */
   databaseHealthCheck(): Promise<boolean>
 }
 
