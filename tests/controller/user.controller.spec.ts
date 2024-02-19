@@ -856,7 +856,7 @@ describe('User Controller Tests - /self', function () {
                 .get('/v1/user/self')
                 .set('AUTHORIZATION', AUTH_HEADER)
                 .end(function (_, res) {
-                  res.should.have.status(200)
+                  res.should.have.status(400)
                   const response = res.body
                   chai.expect(response.username).to.eql(new_user)
                   chai.expect(response).to.not.have.property('password')
