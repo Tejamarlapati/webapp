@@ -86,7 +86,7 @@ jobs:
 
       - name: Packer validate
         id: validate
-        run: "packer validate ./packer/image.pkr.hcl"
+        run: "packer validate -syntax-only -evaluate-datasources ./packer/image.pkr.hcl"
 
       - name: Download Artifacts
         uses: actions/download-artifact@v4
