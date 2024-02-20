@@ -1,6 +1,6 @@
 # CSYE6225 Web API Server
 
-[![CI](https://github.com/marlapativ/webapp/actions/workflows/ci.yml/badge.svg)](https://github.com/marlapativ/webapp/actions/workflows/ci.yml)
+[![packer - custom machine image](https://github.com/CSYE6225-Cloud-Computing-Organization/webapp/actions/workflows/packer-image.yml/badge.svg)](https://github.com/CSYE6225-Cloud-Computing-Organization/webapp/actions/workflows/packer-image.yml)
 
 CSYE6225 Web API Server Implementation
 
@@ -101,29 +101,3 @@ To serve the node application using pm2, use the following command
 To automatically fix lint errors, use the following command
 
     npm run lint:fix
-
-## Database Commands - Additional info
-
-### Stop PostgreSQL database
-
-Login as admin user to access the directory
-
-    sudo su postgresql
-    pg_ctl stop -D {PATH_TO_POSTGRES_DATA}
-
-For Mac OS Users with non-brew installation
-
-    sudo su postgresql
-    cd /Library/PostgreSQL/16/bin/
-    pg_ctl stop -D ../data
-
-### Start PostgreSQL database
-
-    sudo su postgresql
-    pg_ctl start -D {PATH_TO_POSTGRES_DATA}
-
-For Mac OS Users with non-brew installation
-
-    sudo su postgresql
-    cd /Library/PostgreSQL/16/bin/
-    pg_ctl start -D ../data
