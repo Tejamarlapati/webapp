@@ -7,7 +7,7 @@
     "clean:logs": "rm -rf logs",
     "clean": "rm -rf dist/",
     "build": "npm run clean && tsc -p tsconfig.production.json",
-    "postbuild": "cp package*.json dist && cd dist && npm ci --production",
+    "postbuild": "cp package*.json dist",
     "dev": "tsc --watch & NODE_ENV=development nodemon build/src/server",
     "start:pm2": "pm2 delete server || : && pm2 start server.js -i 1 --name 'server'",
     "start": "NODE_ENV=production node server.js",

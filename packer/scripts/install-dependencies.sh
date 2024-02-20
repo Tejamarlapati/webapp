@@ -20,3 +20,7 @@ dnf install -y unzip
 # Install Node (v20.x) if not installed
 dnf module install -y nodejs:20/common
 
+# Update npm
+npm install -g npm@latest
+
+echo "Dependencies installation complete"
