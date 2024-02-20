@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - packer            # CI on test branch
 
 jobs:
   test-and-build:
