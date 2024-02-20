@@ -35,7 +35,8 @@ else
     echo "Database '$database' already exists. Skipping creation."
 fi
 
-# Grant all privileges to the user on the database
+# Grant all privileges & ownership to the user on the database
 sudo -Hiu postgres psql -qc 'GRANT ALL PRIVILEGES ON DATABASE "'"$database"'" TO '"$username"';'
+sudo -Hiu postgres psql -qc 'ALTER DATABASE "'"$database"'" OWNER TO '"$username"';'
 
 echo "User '$username' granted all privileges on database '$database'"

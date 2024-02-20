@@ -14,12 +14,21 @@ echo "Installing PostgreSQL"
 
 # Install PostgreSQL if not installed
 if ! command -v psql &> /dev/null; then
+
+    # Enable PostgreSQL 16 module and install the server
     dnf module enable -y postgresql:16
     dnf install -y postgresql-server
+
+    # Enabling local connections to the database
     export PGSETUP_INITDB_OPTIONS="--auth-host=trust";
+
+    # Initialize the database
     postgresql-setup initdb
+
+    # Start and enable the PostgreSQL service
     systemctl start postgresql
     systemctl enable postgresql
+
     echo "Installed PostgreSQL. Version:"
     postgres --version
 else
