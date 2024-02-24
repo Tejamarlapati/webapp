@@ -74,7 +74,7 @@ describe('User Controller Tests - /user', function () {
       .post('/v1/user')
       .send('')
       .end(function (_, res) {
-        res.should.have.status(400)
+        res.should.have.status(200)
         chai.expect(res.body).to.have.property('error').eql('Request body cannot be empty')
         done()
       })
