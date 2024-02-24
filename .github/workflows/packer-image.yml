@@ -97,14 +97,6 @@ jobs:
           name: webapp
           path: .
 
-      - name: Generate .env file
-        run: |
-          echo "PORT=$PORT" > .env
-          echo "DB_CONN_STRING=$DB_CONN_STRING" >> .env
-        env:
-          PORT: ${{ secrets.WEBAPP_PORT }}
-          DB_CONN_STRING: ${{ secrets.DB_CONN_STRING }}
-      
       - name: Packer build
         id: build
         run: "packer build -color=false -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' ./packer/image.pkr.hcl"

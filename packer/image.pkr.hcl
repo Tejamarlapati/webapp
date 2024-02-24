@@ -104,11 +104,6 @@ build {
     destination = "/tmp/setup/csye6225-webapp.service"
   }
 
-  provisioner "file" {
-    source      = ".env"
-    destination = "/tmp/setup/.env"
-  }
-
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh -eu '{{ .Path }}'"
     scripts = [
