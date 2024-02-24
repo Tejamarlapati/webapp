@@ -73,7 +73,16 @@ class Database implements IDatabase {
  * @returns the sequelize options
  */
 const getSequelizeOptions = (connectionString: string): Options | undefined => {
-  if (connectionString.includes('postgres://')) return { dialect: 'postgres', dialectModule: pg }
+  const isSecure = env.getOrDefault('SSL', 'false') === 'true'
+  if (connectionString.includes('postgres://')) {
+    return {
+      dialect: 'postgres',
+      dialectModule: pg,
+      dialectOptions: {
+        ssl: isSecure && { require: true, rejectUnauthorized: false }
+      }
+    }
+  }
   return undefined
 }
 

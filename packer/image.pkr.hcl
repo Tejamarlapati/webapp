@@ -116,10 +116,7 @@ build {
       "packer/scripts/create-user.sh",
       "packer/scripts/allow-port-access.sh",
       "packer/scripts/setup-webapp.sh",
-      "packer/scripts/setup-systemd.sh",
-      # To setup database
-      "packer/scripts/db/install-db.sh",
-      "packer/scripts/db/setup-db.sh",
+      "packer/scripts/setup-systemd.sh"
     ]
   }
 }

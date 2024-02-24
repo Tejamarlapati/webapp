@@ -12,6 +12,16 @@ import { jsonErrorHandler } from './config/middleware'
 // Setup .env file
 env.loadEnv()
 
+// Graceful shutdown
+const shutdown = async () => {
+  await database.closeDatabaseConnection().catch((error) => {
+    logger.error(`Error while closing database connection. Error: ${error}`)
+  })
+  server.close(() => {
+    logger.info('Server closed')
+  })
+}
+
 // Setup Express Server
 const port = env.getOrDefault('PORT', '8080')
 const app = express()
@@ -35,10 +45,14 @@ app.use(helmet.noSniff())
 routes(app)
 
 // Express Server
-app.listen(port, async () => {
+const server = app.listen(port, async () => {
   const result = await database.syncDatabase()
   logger.info(`Database sync result: ${result}`)
   logger.info(`Server listening on port ${port}`)
 })
+
+// Handling Graceful shutdown
+process.on('SIGTERM', () => shutdown())
+process.on('SIGKILL', () => shutdown())
 
 export default app
