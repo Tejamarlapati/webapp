@@ -9,6 +9,7 @@ User=csye6225
 Group=csye6225
 Environment="NODE_ENV=production"
 WorkingDirectory=/opt/webapp/dist/
+ExecStartPre=/bin/bash -c 'timeout 60 bash -c "while [ ! -f /opt/webapp_startup_completed ]; do sleep 1; done"'
 ExecStart=/usr/bin/node /opt/webapp/dist/server.js
 Restart=always
 RestartSec=3
