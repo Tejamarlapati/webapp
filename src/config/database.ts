@@ -74,12 +74,21 @@ class Database implements IDatabase {
  */
 const getSequelizeOptions = (connectionString: string): Options | undefined => {
   const isSecure = env.getOrDefault('SSL', 'false') === 'true'
+  const defaultTimeout = parseInt(env.getOrDefault('DB_TIMEOUT', '30000'))
   if (connectionString.includes('postgres://')) {
     return {
       dialect: 'postgres',
       dialectModule: pg,
       dialectOptions: {
-        ssl: isSecure && { require: true, rejectUnauthorized: false }
+        ssl: isSecure && { require: true, rejectUnauthorized: false },
+        connectionTimeoutMillis: defaultTimeout,
+        requestTimeout: defaultTimeout,
+        connectionTimeout: defaultTimeout
+      },
+      pool: {
+        max: 10,
+        min: 0,
+        acquire: defaultTimeout
       }
     }
   }
