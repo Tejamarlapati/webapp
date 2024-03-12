@@ -98,6 +98,6 @@ To serve the node application using pm2, use the following command
 
     npm run lint
 
-To automatically fix lint errors, use the following command
+-> To automatically fix lint errors, use the following command
 
     npm run lint:fix
