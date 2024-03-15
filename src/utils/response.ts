@@ -13,7 +13,7 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR
   if (data && data.error instanceof HttpStatusError) {
     statusCode = data.error.statusCode
-    logger.error(`Status Code: ${statusCode} Error: ${data.error.message}`)
+    logger.info(`Status Code: ${statusCode} Error: ${data.error.message}`)
 
     // Special case to handle bad request errors
     if (statusCode === StatusCodes.BAD_REQUEST && !data.error.ignoreMessage) {
