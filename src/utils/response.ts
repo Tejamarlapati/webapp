@@ -4,6 +4,10 @@ import { Result, ResultError } from './result'
 import { Response } from 'express'
 import logger from '../config/logger'
 
+const getErrorMessage = (error: Error) => {
+  return error.message ? `Error: ${error.message}` : ''
+}
+
 /**
  * Handle error response
  * @param res Response object
@@ -13,7 +17,7 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
   let statusCode = StatusCodes.INTERNAL_SERVER_ERROR
   if (data && data.error instanceof HttpStatusError) {
     statusCode = data.error.statusCode
-    logger.info(`Status Code: ${statusCode} Error: ${data.error.message}`)
+    logger.info(`Status Code: ${statusCode} ${getErrorMessage(data.error)}`)
 
     // Special case to handle bad request errors
     if (statusCode === StatusCodes.BAD_REQUEST && !data.error.ignoreMessage) {
