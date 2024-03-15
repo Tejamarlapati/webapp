@@ -111,7 +111,8 @@ build {
       "packer/scripts/create-user.sh",
       "packer/scripts/allow-port-access.sh",
       "packer/scripts/setup-webapp.sh",
-      "packer/scripts/setup-systemd.sh"
+      "packer/scripts/setup-systemd.sh",
+      "packer/scripts/install-ops-agent.sh"
     ]
   }
 }
