@@ -47,7 +47,7 @@ class Database implements IDatabase {
       await this._sequelize.sync()
       return true
     } catch (error) {
-      logger.error(`Error while syncing database. Error: ${error}`)
+      logger.error(`Error while syncing database.`, error)
       return false
     }
   }

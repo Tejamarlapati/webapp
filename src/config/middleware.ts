@@ -15,7 +15,7 @@ import healthCheckService from '../services/healthcheck.service'
 export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (err: Error, req: Request, res: Response, _: NextFunction) => {
-    logger.error(`Error: ${err.message} Request body: ${req.body}`)
+    logger.error('Cannot parse JSON in request body', err, req.body)
     handleResponse(res, errors.validationError('Malformed JSON in request body', true))
   }
 }
