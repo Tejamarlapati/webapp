@@ -14,8 +14,13 @@ const logLevels = {
   trace: 5
 }
 
-const logFormat = printf(({ level, message, timestamp }) => {
-  return `[${timestamp}] [${getUserIdFromContext() ?? ''}] ${level}: ${message}`
+const logFormat = printf((info) => {
+  const log = {
+    ...info,
+    message: `${info.message?.trim()}`,
+    userId: getUserIdFromContext()
+  }
+  return JSON.stringify(log)
 })
 
 const logFolder = env.getOrDefault('LOG_FOLDER', './logs')
@@ -33,7 +38,7 @@ const transports = [
 const logger = winston.createLogger({
   levels: logLevels,
   level: defaultLogLevel,
-  format: combine(timestamp({ format: 'YYYY-MM-DD hh:mm:ss A' }), align(), logFormat),
+  format: combine(timestamp(), align(), logFormat),
   transports: transports
 })
 

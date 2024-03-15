@@ -104,6 +104,11 @@ build {
     destination = "/tmp/setup/csye6225-webapp.service"
   }
 
+  provisioner "file" {
+    source      = "packer/scripts/gcp-ops-log-config/config.yaml"
+    destination = "/tmp/setup/config.yaml"
+  }
+
   provisioner "shell" {
     execute_command = "chmod +x {{ .Path }}; {{ .Vars }} sudo -E sh -eu '{{ .Path }}'"
     scripts = [
@@ -112,7 +117,7 @@ build {
       "packer/scripts/allow-port-access.sh",
       "packer/scripts/setup-webapp.sh",
       "packer/scripts/setup-systemd.sh",
-      "packer/scripts/install-ops-agent.sh"
+      "packer/scripts/setup-ops-agent.sh"
     ]
   }
 }

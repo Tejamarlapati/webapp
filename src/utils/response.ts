@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes'
 import { HttpStatusError } from './errors'
 import { Result, ResultError } from './result'
 import { Response } from 'express'
+import logger from '../config/logger'
 
 /**
  * Handle error response
@@ -15,6 +16,7 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
 
     // Special case to handle bad request errors
     if (statusCode === StatusCodes.BAD_REQUEST && !data.error.ignoreMessage) {
+      logger.error(data.error.message)
       res.status(statusCode).json({ error: data.error.message })
       return
     }

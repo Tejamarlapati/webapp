@@ -76,7 +76,7 @@ export class UserService implements IUserService {
       logger.info('Created user with id: ' + savedUser.id)
       return Ok(savedUser.toJSON() as User)
     } catch (error) {
-      logger.error(`Error creating user: ${error}`)
+      logger.error('Error creating user', error)
       return errors.internalServerError(`Error creating user: ${error}`)
     }
   }
@@ -115,7 +115,7 @@ export class UserService implements IUserService {
       logger.info('Updated user with id: ' + updatedUser.id)
       return Ok(updatedUser.toJSON() as User)
     } catch (error) {
-      logger.error(`Error updating user: ${error}`)
+      logger.error('Error updating user', error)
       return errors.internalServerError(`Error updating user: ${error}`)
     }
   }
@@ -128,9 +128,10 @@ export class UserService implements IUserService {
       if (!user) {
         return errors.notFoundError('User not found')
       }
+      logger.info('Successfully fetched user details for userid: ' + loggedInUser)
       return Ok(user)
     } catch (error) {
-      logger.error(`Error fetching user: ${error}`)
+      logger.error('Error fetching user', error)
       return errors.internalServerError(`Error fetching user: ${error}`)
     }
   }
