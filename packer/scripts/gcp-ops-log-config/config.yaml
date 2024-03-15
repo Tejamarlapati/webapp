@@ -8,13 +8,15 @@ logging:
   processors:
     webapp-processor:
       type: parse_json
-      time_key: time
-      time_format: "%Y-%m-%dT%H:%M:%S.%L%Z"
-      copy_fields:
-        - from: "level"
-          to: "severity"
+      time_key: timestamp
+      time_format: "%Y-%m-%dT%H:%M:%S.%LZ"
+    copy-severity:
+      type: modify_fields
+      fields:
+        severity:
+          copy_from: jsonPayload.level
   service:
     pipelines:
       default_pipeline:
         receivers: [webapp-receiver]
-        processors: [webapp-processor]
+        processors: [webapp-processor,copy-severity]
