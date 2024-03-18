@@ -137,6 +137,7 @@ export class UserService implements IUserService {
   }
 
   async validateCreateUser(user: User): Promise<string | null> {
+    logger.debug('Validating create user')
     if (!user) return 'User details have to be defined'
     else if (!validator.isNullOrUndefined(user.id)) return 'id is not allowed'
     else if (!validator.isValidString(user.first_name)) return 'first_name is required and should be a string'
@@ -154,6 +155,8 @@ export class UserService implements IUserService {
         return `Field ${field} cannot be set during user creation`
       }
     }
+
+    logger.debug('Validating create user complete - Field Validation')
     try {
       const userModel = User.build({
         username: user.username,
@@ -162,13 +165,16 @@ export class UserService implements IUserService {
         last_name: user.last_name
       })
       await userModel.validate()
+      logger.debug('Validating create user complete - User model')
     } catch (err) {
       return err.message
     }
+    logger.debug('Validating create user successfully complete')
     return null
   }
 
   async validateUpdateUser(user: User): Promise<string | null> {
+    logger.debug('Validating update user')
     if (!user) return 'User details have to be defined'
     const updatableFields = ['first_name', 'last_name', 'password']
 
@@ -191,12 +197,15 @@ export class UserService implements IUserService {
       update[field] = value
     }
 
+    logger.debug('Validating update user complete - Field Validation')
     try {
       const userModel = User.build(update)
       await userModel.validate({ fields: Object.keys(update) })
+      logger.debug('Validating update user complete - User model')
     } catch (err) {
       return err.message
     }
+    logger.debug('Validating update user successfully complete')
     return null
   }
 }

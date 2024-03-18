@@ -19,6 +19,9 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
     statusCode = data.error.statusCode
     logger.info(`Status Code: ${statusCode}${getErrorMessage(data.error)}`)
 
+    if (statusCode == StatusCodes.METHOD_NOT_ALLOWED) {
+      logger.warn('Trying to invoke not allowed method.')
+    }
     // Special case to handle bad request errors
     if (statusCode === StatusCodes.BAD_REQUEST && !data.error.ignoreMessage) {
       res.status(statusCode).json({ error: data.error.message })

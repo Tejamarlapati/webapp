@@ -24,7 +24,7 @@ class HealthCheckService implements IHealthCheckService {
       await this._database.getDatabaseConnection().authenticate()
       return true
     } catch {
-      logger.error('Database health check failed')
+      logger.warn('Database health check failed')
       return false
     }
   }
