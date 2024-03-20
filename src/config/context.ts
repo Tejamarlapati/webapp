@@ -17,11 +17,29 @@ export const setUserIdInContext = (userId: string) => {
 }
 
 /**
+ * Set the request id in the context
+ * @param requestId the request id to set in the context
+ */
+export const setRequestIdInContext = (requestId: string) => {
+  expressHttpContext.set('requestId', requestId)
+}
+
+/**
+ * Get the request id from the context
+ * @returns the request id from the context
+ */
+export const getRequestIdFromContext = () => {
+  return expressHttpContext.get('requestId') ?? null
+}
+
+/**
  * Interface for the context
  */
 export interface IContext {
   getUserIdFromContext: () => string
   setUserIdInContext: (userId: string) => void
+  setRequestIdInContext: (requestId: string) => void
+  getRequestIdFromContext: () => string
 }
 
 /**
@@ -29,7 +47,9 @@ export interface IContext {
  */
 const httpContext: IContext = {
   getUserIdFromContext,
-  setUserIdInContext
+  setUserIdInContext,
+  setRequestIdInContext,
+  getRequestIdFromContext
 }
 
 export default httpContext

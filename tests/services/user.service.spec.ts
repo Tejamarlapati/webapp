@@ -11,6 +11,9 @@ const mockCrypto: ICrypto = {
   },
   comparePassword: async (password: string, hashedPassword: string) => {
     throw new Error('Error comparing password' + password + ' ' + hashedPassword)
+  },
+  generateRandomUUID: () => {
+    throw new Error('Error generating random UUID')
   }
 }
 
@@ -20,6 +23,12 @@ const mockContext: IContext = {
   },
   setUserIdInContext: (userId: string) => {
     throw new Error('Error from context: ' + userId)
+  },
+  setRequestIdInContext: (requestId: string) => {
+    throw new Error('Error from context: ' + requestId)
+  },
+  getRequestIdFromContext: () => {
+    throw new Error('Error from context')
   }
 }
 

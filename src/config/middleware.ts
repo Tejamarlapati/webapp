@@ -4,9 +4,16 @@ import logger from './logger'
 import crypto from './crypto'
 import errors from '../utils/errors'
 import User from '../models/user.model'
-import { setUserIdInContext } from './context'
+import { setUserIdInContext, setRequestIdInContext } from './context'
 import { handleResponse } from '../utils/response'
-import healthCheckService from '../services/healthcheck.service'
+
+export const requestId = () => {
+  return (_: Request, _1: Response, next: NextFunction) => {
+    const requestId = crypto.generateRandomUUID()
+    setRequestIdInContext(requestId)
+    next()
+  }
+}
 
 /**
  * Middleware to handle invalid json request
@@ -14,24 +21,12 @@ import healthCheckService from '../services/healthcheck.service'
  */
 export const jsonErrorHandler = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return (err: Error, req: Request, res: Response, _: NextFunction) => {
-    logger.error('Cannot parse JSON in request body', err, req.body)
-    handleResponse(res, errors.validationError('Malformed JSON in request body', true))
-  }
-}
-
-/**
- * Middleware to handle if the database is not healthy
- * @returns a middleware that checks if the database is healthy
- */
-export const dbHealthCheck = () => {
-  return async (_: Request, res: Response, next: NextFunction) => {
-    const isHealthy = await healthCheckService.databaseHealthCheck()
-    if (!isHealthy) {
-      handleResponse(res, errors.serviceUnavailableError('Database is not healthy'))
-      return
+  return (err: unknown, _: Request, res: Response, __: NextFunction) => {
+    if (err && typeof err === 'object' && 'body' in err) {
+      delete err.body
     }
-    next()
+    logger.error('Cannot parse JSON in request body', err)
+    handleResponse(res, errors.validationError('Malformed JSON in request body', true))
   }
 }
 

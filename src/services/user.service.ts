@@ -45,24 +45,31 @@ export class UserService implements IUserService {
   async createUser(user: User): Promise<Result<User, Error>> {
     try {
       logger.info('Creating user')
+
+      logger.debug('Create user - Field validation start')
       // Validate the user
       const validationError = await this.validateCreateUser(user)
       if (validationError) {
+        logger.debug('Create user - Field validation error | Error: ' + validationError)
         return errors.validationError(validationError)
       }
+      logger.debug('Create user - Field validation end')
 
       // Check if user with the given email already exists
       const username = user.username
-      logger.info('Creating user with username: ' + username)
-
+      logger.debug('Create user - Validating if user with username already exists')
       const existingUser = await User.findOne({ where: { username } })
       if (existingUser) {
+        logger.debug('Create user - Validation error | Error: Username already exists')
         return errors.validationError('User with this username already exists')
       }
+      logger.debug('Create user - Validation end')
 
+      logger.debug('Create user - Hashing password')
       // Hash the password
       const hashedPassword = await this.crypto.hashPassword(user.password)
 
+      logger.info('Creating user in database')
       // Create the user model
       const newUser = new User({
         first_name: user.first_name,
@@ -71,6 +78,7 @@ export class UserService implements IUserService {
         password: hashedPassword
       })
 
+      logger.debug('Create user - Saving user to database')
       // Save the user to the database
       const savedUser = await newUser.save()
       logger.info('Created user with id: ' + savedUser.id)
@@ -85,31 +93,40 @@ export class UserService implements IUserService {
     try {
       logger.info('Updating user')
 
+      logger.debug('Update user - Field validation start')
       // Validate the user
       const validationError = await this.validateUpdateUser(user)
       if (validationError) {
+        logger.debug('Update user - Field validation error | Error: ' + validationError)
         return errors.validationError(validationError)
       }
+      logger.debug('Update user - Field validation end')
 
       // Find the user by user id from context
       const userId = this.httpContext.getUserIdFromContext()
       logger.info('Updating user with userId: ' + userId)
 
+      logger.debug('Update user - Validating if user exists')
       const existingUser = await User.findByPk(userId)
       if (!existingUser) {
+        logger.debug('Update user - Validation error | Error: User not found')
         return errors.notFoundError('User not found')
       }
+      logger.debug('Update user - Validation end')
 
+      logger.debug('Update user - Updating user details')
       // Update only allowed fields
       existingUser.first_name = user.first_name || existingUser.first_name
       existingUser.last_name = user.last_name || existingUser.last_name
 
+      logger.debug('Update user - Hashing password if provided')
       // Hash the password if provided
       if (user.password) {
         const hashedPassword = await this.crypto.hashPassword(user.password)
         existingUser.password = hashedPassword
       }
 
+      logger.debug('Update user - Saving user to database')
       // Save the updated user to the database
       const updatedUser = await existingUser.save()
       logger.info('Updated user with id: ' + updatedUser.id)
@@ -122,10 +139,15 @@ export class UserService implements IUserService {
 
   async getUser(): Promise<Result<User, Error>> {
     try {
+      logger.info('Fetching user details')
+
+      logger.debug('Fetching user details from context')
       const loggedInUser = this.httpContext.getUserIdFromContext()
-      logger.info('Fetching user details for userid: ' + loggedInUser)
+
+      logger.debug('Fetching user details from database for user: ' + loggedInUser)
       const user = await User.findByPk(loggedInUser)
       if (!user) {
+        logger.debug('User not found')
         return errors.notFoundError('User not found')
       }
       logger.info('Successfully fetched user details for userid: ' + loggedInUser)
@@ -137,7 +159,7 @@ export class UserService implements IUserService {
   }
 
   async validateCreateUser(user: User): Promise<string | null> {
-    logger.debug('Validating create user')
+    logger.debug('Validating create user field details')
     if (!user) return 'User details have to be defined'
     else if (!validator.isNullOrUndefined(user.id)) return 'id is not allowed'
     else if (!validator.isValidString(user.first_name)) return 'first_name is required and should be a string'
@@ -156,7 +178,7 @@ export class UserService implements IUserService {
       }
     }
 
-    logger.debug('Validating create user complete - Field Validation')
+    logger.debug('Validating create user model')
     try {
       const userModel = User.build({
         username: user.username,
@@ -165,8 +187,9 @@ export class UserService implements IUserService {
         last_name: user.last_name
       })
       await userModel.validate()
-      logger.debug('Validating create user complete - User model')
+      logger.debug('Create user field details validation successful')
     } catch (err) {
+      logger.debug('Create user field details validation failed | Error: ' + err.message)
       return err.message
     }
     logger.debug('Validating create user successfully complete')
@@ -174,7 +197,7 @@ export class UserService implements IUserService {
   }
 
   async validateUpdateUser(user: User): Promise<string | null> {
-    logger.debug('Validating update user')
+    logger.debug('Validating update user field details')
     if (!user) return 'User details have to be defined'
     const updatableFields = ['first_name', 'last_name', 'password']
 
@@ -197,12 +220,13 @@ export class UserService implements IUserService {
       update[field] = value
     }
 
-    logger.debug('Validating update user complete - Field Validation')
+    logger.debug('Validating update user model')
     try {
       const userModel = User.build(update)
       await userModel.validate({ fields: Object.keys(update) })
-      logger.debug('Validating update user complete - User model')
+      logger.debug('Update user field details validation successful')
     } catch (err) {
+      logger.debug('Update user field details validation failed | Error: ' + err.message)
       return err.message
     }
     logger.debug('Validating update user successfully complete')

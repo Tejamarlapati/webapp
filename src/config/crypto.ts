@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs'
+import cryptoNode from 'crypto'
 
 // Generate salt
 const salt = bcrypt.genSaltSync(10)
@@ -23,11 +24,20 @@ const comparePassword = async (password: string, hashedPassword: string) => {
 }
 
 /**
+ * Generate a random UUID
+ * @returns a random UUID
+ */
+const generateRandomUUID = () => {
+  return cryptoNode.randomUUID()
+}
+
+/**
  * Interface for the crypto
  */
 export interface ICrypto {
   hashPassword: (password: string) => Promise<string>
   comparePassword: (password: string, hashedPassword: string) => Promise<boolean>
+  generateRandomUUID: () => string
 }
 
 /**
@@ -35,7 +45,8 @@ export interface ICrypto {
  */
 const crypto: ICrypto = {
   hashPassword,
-  comparePassword
+  comparePassword,
+  generateRandomUUID
 }
 
 export default crypto

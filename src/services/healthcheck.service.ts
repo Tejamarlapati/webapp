@@ -21,7 +21,9 @@ class HealthCheckService implements IHealthCheckService {
 
   async databaseHealthCheck(): Promise<boolean> {
     try {
+      logger.info('Checking database health')
       await this._database.getDatabaseConnection().authenticate()
+      logger.info('Database health check passed')
       return true
     } catch {
       logger.warn('Database health check failed')

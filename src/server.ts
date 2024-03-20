@@ -7,7 +7,7 @@ import env from './config/env'
 import routes from './routes/index'
 import logger from './config/logger'
 import database from './config/database'
-import { jsonErrorHandler } from './config/middleware'
+import { jsonErrorHandler, requestId } from './config/middleware'
 
 // Setup .env file
 env.loadEnv()
@@ -18,6 +18,7 @@ const app = express()
 
 // Setup http context
 app.use(httpContext.middleware)
+app.use(requestId())
 
 // Setup Express Middlewares
 app.use(express.json())

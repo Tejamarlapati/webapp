@@ -1,6 +1,6 @@
 import winston from 'winston'
 import env from './env'
-import { getUserIdFromContext } from './context'
+import { getRequestIdFromContext, getUserIdFromContext } from './context'
 
 env.loadEnv()
 
@@ -18,7 +18,8 @@ const logFormat = printf((info) => {
   const log = {
     ...info,
     message: `${info.message?.trim()}`,
-    userId: getUserIdFromContext()
+    userId: getUserIdFromContext(),
+    requestId: getRequestIdFromContext()
   }
   return JSON.stringify(log)
 })
