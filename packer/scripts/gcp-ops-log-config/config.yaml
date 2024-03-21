@@ -15,8 +15,6 @@ logging:
       fields:
         severity:
           copy_from: jsonPayload.level
-        request_id:
-          copy_from: jsonPayload.requestId
   service:
     pipelines:
       default_pipeline:
