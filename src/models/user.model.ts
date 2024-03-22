@@ -11,8 +11,8 @@ class User extends Model {
   public username!: string
   public password!: string
   public email_verified: boolean
-  public email_verification_token: string
-  public email_verification_expiry: Date
+  public email_verification_token: string | null
+  public email_verification_expiry: Date | null
   public account_created!: Date
   public account_updated!: Date
 

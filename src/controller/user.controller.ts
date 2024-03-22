@@ -16,9 +16,15 @@ const userController: Router = express.Router()
  */
 const userSelfController: Router = express.Router()
 
+/**
+ * The user verify controller
+ */
+const userVerifyController: Router = express.Router()
+
 // "v1/user" routes
 userController
   // Authorized self routes
+  .use('/verify', userVerifyController)
   .use('/self', userSelfController)
   .head('/', (_, res) => {
     res.status(StatusCodes.METHOD_NOT_ALLOWED).send()
@@ -63,6 +69,17 @@ userSelfController
     // Updating user
     const user = req.body as User
     const response = await userService.updateUser(user)
+    handleResponse(res, response)
+  })
+  .all('/', (_, res) => {
+    handleResponse(res, errors.methodNotAllowedError())
+  })
+
+// "v1/user/verify" routes
+userVerifyController
+  .get('/', async (req, res) => {
+    const { email, auth_token } = req.query as { email: string; auth_token: string }
+    const response = await userService.verifyEmail(email, auth_token)
     handleResponse(res, response)
   })
   .all('/', (_, res) => {

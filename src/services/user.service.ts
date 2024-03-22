@@ -30,6 +30,14 @@ export interface IUserService {
    * @returns the user or error
    */
   getUser(): Promise<Result<User, Error>>
+
+  /**
+   * Verify the email of a user on creation
+   * @param email the email to verify
+   * @param token the token to verify
+   * @returns true if the email is verified, false otherwise
+   */
+  verifyEmail(email: string, token: string): Promise<Result<string, Error>>
 }
 
 /**
@@ -157,13 +165,59 @@ export class UserService implements IUserService {
       logger.debug('Fetching user details from database for user: ' + loggedInUser)
       const user = await User.findByPk(loggedInUser)
       if (!user) {
-        logger.debug('User not found')
+        logger.info('User not found')
         return errors.notFoundError('User not found')
       }
       logger.info('Successfully fetched user details for userid: ' + loggedInUser)
       return Ok(user)
     } catch (error) {
       logger.error('Error fetching user', error)
+      return errors.internalServerError(`Error fetching user: ${error}`)
+    }
+  }
+
+  verifyEmail = async (email: string, token: string): Promise<Result<string, Error>> => {
+    try {
+      logger.info('Verifying user with email')
+
+      const currentDate = new Date()
+      logger.debug('Fetching user details from database by email')
+      const user = await User.findOne({ where: { username: email } })
+      if (!user) {
+        logger.info('User not found')
+        return errors.notFoundError('User not found')
+      }
+      logger.info('Successfully fetched user details for userid: ' + user.id)
+
+      logger.debug('Verifying token')
+      if (!user.email_verification_expiry || !user.email_verification_expiry) {
+        logger.info('Email verify hasn"t been invoked for user ' + user.id)
+        return errors.forbiddenError('Email verify hasn"t been invoked for user')
+      }
+
+      logger.debug('Verification token and expiry found')
+      if (user.email_verification_token !== token) {
+        logger.info('Invalid link used for verification')
+        return errors.forbiddenError('Invalid link used for verification')
+      }
+
+      if (currentDate > user.email_verification_expiry) {
+        logger.info('Expired link used for verification')
+        return errors.forbiddenError('Invalid/Expired link used for verification')
+      }
+
+      logger.info('Token verified for user ' + user.id)
+
+      logger.debug('Updating user email verification status')
+      user.email_verified = true
+      user.email_verification_token = null
+      user.email_verification_expiry = null
+      await user.save()
+
+      logger.info('Successfully verified email for user ' + user.id)
+      return Ok('Email verified')
+    } catch (error) {
+      logger.error('Error verifying email for user', error)
       return errors.internalServerError(`Error fetching user: ${error}`)
     }
   }

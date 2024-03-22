@@ -20,14 +20,6 @@ export const createOrUpdateTestUser = async (username?: string, password?: strin
   return await user.save()
 }
 
-export const verifyEmail = async (username: string) => {
-  const user = await User.findOne({ where: { username } })
-  if (user) {
-    user.email_verified = true
-    await user.save()
-  }
-}
-
 export const createDefaultUsers = async () => {
   await createOrUpdateTestUser('test@test.com', '$2a$10$RVHD7EksNzceEezVsMFlCeaa5PYJKGkkiqkQbnC/ezjTIAymuLwui')
   await createOrUpdateTestUser('integration@test.com', '$2a$10$RVHD7EksNzceEezVsMFlCeaa5PYJKGkkiqkQbnC/ezjTIAymuLwui')
