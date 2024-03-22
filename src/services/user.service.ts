@@ -182,6 +182,11 @@ export class UserService implements IUserService {
     try {
       logger.info('Verifying user with email')
 
+      if (!email || !token) {
+        logger.info('Email or token not provided. Cannot verify email')
+        return errors.validationError('Invalid link. Cannot verify email')
+      }
+
       const currentDate = new Date()
       logger.debug('Fetching user details from database by email')
       const user = await User.findOne({ where: { username: email } })
