@@ -73,15 +73,22 @@ export const authorized = () => {
     const username = result.name
     const user = await User.scope(['withPassword']).findOne({ where: { username } })
     if (!user) {
-      logger.info(`Cannot find user. User: ${result!.name}`)
+      logger.info(`Cannot find user.`)
       handleResponse(res, errors.unAuthorizedError())
       return
     }
 
     const isPasswordMatch = await crypto.comparePassword(result!.pass, user!.password)
     if (!isPasswordMatch) {
-      logger.info(`Password mismatch. User: ${result!.name}`)
+      logger.info(`Password mismatch.`)
       handleResponse(res, errors.unAuthorizedError())
+      return
+    }
+
+    const isUserVerified = user!.is_verified
+    if (!isUserVerified) {
+      logger.info(`User is not verified.`)
+      handleResponse(res, errors.forbiddenError('User is not verified'))
       return
     }
 

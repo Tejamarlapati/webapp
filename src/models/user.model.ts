@@ -10,6 +10,7 @@ class User extends Model {
   public last_name!: string
   public username!: string
   public password!: string
+  public is_verified!: boolean
   public account_created!: Date
   public account_updated!: Date
 
@@ -35,6 +36,11 @@ User.init(
     last_name: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    is_verified: {
+      type: DataTypes.BOOLEAN,
+      allowNull: false,
+      defaultValue: false
     },
     username: {
       type: DataTypes.STRING,
