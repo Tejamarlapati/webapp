@@ -781,7 +781,6 @@ describe('User Controller Tests - /self', function () {
       // Verify Email of the user
       res = await chai.request(server).get(`/v1/user/verify?email=${new_user}&auth_token=${response.id}`).send()
       res.should.have.status(200)
-      console.log(res)
       chai.expect(res.body).to.eql('Email verified')
 
       // New user should have access
@@ -824,7 +823,6 @@ describe('User Controller Tests - /self', function () {
       // Verify Email of the user
       let res = await chai.request(server).get(`/v1/user/verify?email=${new_user}&auth_token=${response.id}`).send()
       res.should.have.status(200)
-      console.log(res)
       chai.expect(res.body).to.eql('Email verified')
 
       // Previous function creates and validates a new user, now we update it
