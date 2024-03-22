@@ -16,7 +16,7 @@ class IntegrationTestPublisher implements IPublisher {
     if (!user) return new DefaultError(new Error('User not found'))
 
     user.email_verification_token = message.userId
-    user.email_verification_expiry = new Date(new Date().getTime() + 2 * 60000)
+    user.email_verification_sent_date = new Date()
     await user.save()
 
     return Ok('Message published')

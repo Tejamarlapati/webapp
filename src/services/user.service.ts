@@ -6,6 +6,7 @@ import errors from '../utils/errors'
 import crypto, { ICrypto } from '../config/crypto'
 import httpContext, { IContext } from '../config/context'
 import { publisherFactory } from '../config/publisher'
+import env from '../config/env'
 
 /**
  * The user service interface
@@ -94,7 +95,8 @@ export class UserService implements IUserService {
 
       // Publish the user created event
       logger.debug('Create user - Publishing user created event')
-      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id })
+      const topic = env.getOrDefault('PUBSUB_TOPIC', 'verify_email')
+      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id }, topic)
       if (!publishResult.ok) {
         logger.error('Create user - Error publishing user created event', publishResult.error)
         return errors.internalServerError('Created User. Unable to send verify email.')
@@ -190,7 +192,7 @@ export class UserService implements IUserService {
       logger.info('Successfully fetched user details for userid: ' + user.id)
 
       logger.debug('Verifying token')
-      if (!user.email_verification_expiry || !user.email_verification_expiry) {
+      if (!user.email_verification_token || !user.email_verification_sent_date) {
         logger.info('Email verify hasn"t been invoked for user ' + user.id)
         return errors.forbiddenError('Email verify hasn"t been invoked for user')
       }
@@ -201,7 +203,10 @@ export class UserService implements IUserService {
         return errors.forbiddenError('Invalid link used for verification')
       }
 
-      if (currentDate > user.email_verification_expiry) {
+      // Adding expiry duration minutes to last email sent date
+      const expiryDurationInMin = parseInt(env.getOrDefault('EMAIL_EXPIRY_MINUTES', '2'))
+      const expiry = new Date(user.email_verification_sent_date.getTime() + expiryDurationInMin * 60000)
+      if (currentDate > expiry) {
         logger.info('Expired link used for verification')
         return errors.forbiddenError('Invalid/Expired link used for verification')
       }
@@ -211,7 +216,7 @@ export class UserService implements IUserService {
       logger.debug('Updating user email verification status')
       user.email_verified = true
       user.email_verification_token = null
-      user.email_verification_expiry = null
+      user.email_verification_sent_date = null
       await user.save()
 
       logger.info('Successfully verified email for user ' + user.id)

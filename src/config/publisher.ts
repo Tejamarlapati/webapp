@@ -11,9 +11,9 @@ export interface IPublisher {
   /**
    * Publishes the given data to the given topic.
    * @param data The data to publish.
-   * @param topicNameOrId The name or id of the topic to publish to. If not provided, defaults to the PUBSUB_TOPIC environment variable.
+   * @param topicNameOrId The name or id of the topic to publish to.
    */
-  publish<T>(data: T, topicNameOrId?: string | undefined): Promise<Result<string, Error>>
+  publish<T>(data: T, topicNameOrId?: string): Promise<Result<string, Error>>
 }
 
 /**
@@ -29,14 +29,13 @@ class GoogleCloudPublisher implements IPublisher {
   /**
    * Publishes the given data to the given topic.
    * @param data The data to publish.
-   * @param topicNameOrId The name or id of the topic to publish to. If not provided, defaults to the PUBSUB_TOPIC environment variable.
+   * @param topicNameOrId The name or id of the topic to publish to.
    */
-  async publish<T>(data: T, topicNameOrId?: string | undefined): Promise<Result<string, Error>> {
-    const topic = topicNameOrId || env.getOrDefault('PUBSUB_TOPIC', '')
+  async publish<T>(data: T, topicNameOrId: string): Promise<Result<string, Error>> {
     const dataBuffer = Buffer.from(JSON.stringify(data))
     try {
-      logger.info('Publishing message to topic: ', topic)
-      const messageId = await this.pubSubClient.topic(topic).publishMessage({ data: dataBuffer })
+      logger.info('Publishing message to topic: ', topicNameOrId)
+      const messageId = await this.pubSubClient.topic(topicNameOrId).publishMessage({ data: dataBuffer })
       logger.info(`Message ${messageId} published.`)
       return Ok(messageId)
     } catch (error) {

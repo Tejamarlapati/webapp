@@ -12,7 +12,7 @@ class User extends Model {
   public password!: string
   public email_verified: boolean
   public email_verification_token: string | null
-  public email_verification_expiry: Date | null
+  public email_verification_sent_date: Date | null
   public account_created!: Date
   public account_updated!: Date
 
@@ -60,7 +60,7 @@ User.init(
       type: DataTypes.STRING,
       allowNull: true
     },
-    email_verification_expiry: {
+    email_verification_sent_date: {
       type: DataTypes.DATE,
       allowNull: true
     }
