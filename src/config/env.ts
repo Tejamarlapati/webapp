@@ -21,11 +21,20 @@ const getOrDefault = (key: string, defaultValue: string): string => {
 }
 
 /**
+ * Check if the environment is test
+ * @returns true if the environment is test
+ */
+const isTest = (): boolean => {
+  return process.env.NODE_ENV === 'test'
+}
+
+/**
  * Interface for the environment variables
  */
 const env = {
   loadEnv,
-  getOrDefault
+  getOrDefault,
+  isTest
 }
 
 export default env

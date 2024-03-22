@@ -7,15 +7,25 @@ export const createOrUpdateTestUser = async (username?: string, password?: strin
   if (user) {
     user.first_name = 'TJ'
     user.last_name = 'M'
+    user.email_verified = true
   } else {
     user = User.build({
       first_name: 'TJ',
       last_name: 'M',
       username: username,
-      password: password
+      password: password,
+      email_verified: true
     })
   }
   return await user.save()
+}
+
+export const verifyEmail = async (username: string) => {
+  const user = await User.findOne({ where: { username } })
+  if (user) {
+    user.email_verified = true
+    await user.save()
+  }
 }
 
 export const createDefaultUsers = async () => {

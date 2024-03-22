@@ -46,5 +46,23 @@ class GoogleCloudPublisher implements IPublisher {
   }
 }
 
-const publisher: IPublisher = new GoogleCloudPublisher()
-export default publisher
+class MockPublisher implements IPublisher {
+  async publish<T>(data: T, topicNameOrId?: string | undefined): Promise<Result<string, Error>> {
+    const isSuccess = typeof data === 'boolean' ? data : true
+    topicNameOrId ??= 'mock-topic'
+    return isSuccess ? Ok(topicNameOrId) : new DefaultError(new Error('Failed to publish message'))
+  }
+}
+
+let publisher: IPublisher
+export const publisherFactory = {
+  get: (): IPublisher => {
+    if (publisher) return publisher
+    if (env.isTest()) {
+      publisher = new MockPublisher()
+    } else {
+      publisher = new GoogleCloudPublisher()
+    }
+    return publisher
+  }
+}

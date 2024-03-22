@@ -23,10 +23,12 @@ const handleErrorResponse = <E extends Error>(res: Response, data: ResultError<E
     } else {
       logger.info(`Status Code: ${statusCode}${getErrorMessage(data.error)}`)
     }
-    // Special case to handle bad request errors
-    if (statusCode === StatusCodes.BAD_REQUEST && !data.error.ignoreMessage) {
-      res.status(statusCode).json({ error: data.error.message })
-      return
+    if (!data.error.ignoreMessage) {
+      // Special case to handle Internal Server Error and Bad Request
+      if (statusCode === StatusCodes.BAD_REQUEST || statusCode === StatusCodes.INTERNAL_SERVER_ERROR) {
+        res.status(statusCode).json({ error: data.error.message })
+        return
+      }
     }
   }
   res.status(statusCode).send()

@@ -85,7 +85,7 @@ export const authorized = () => {
       return
     }
 
-    const isUserVerified = user!.is_verified
+    const isUserVerified = user!.email_verified
     if (!isUserVerified) {
       logger.info(`User is not verified.`)
       handleResponse(res, errors.forbiddenError('User is not verified'))

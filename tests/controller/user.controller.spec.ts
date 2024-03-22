@@ -1,7 +1,7 @@
 import chai from 'chai'
 import chaiHTTP from 'chai-http'
 import server from '../../src/server'
-import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
+import { createDefaultUsers, createOrUpdateTestUser, verifyEmail } from '../utils/user-utils'
 import database from '../../src/config/database'
 import User from '../../src/models/user.model'
 
@@ -755,21 +755,37 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 with proper details on /user/self after creating a new user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
+      const res = await chai.request(server).post('/v1/user').send({
+        first_name: 'TJ',
+        last_name: 'TJ',
+        username: new_user,
+        password: password
+      })
+      res.should.have.status(201)
+      const response = res.body
+      chai.expect(response.username).to.eql(new_user)
+      chai.expect(response).to.not.have.property('password')
+      chai.expect(response.first_name).to.eql('TJ')
+      chai.expect(response.last_name).to.eql('TJ')
+      chai
+        .expect(response)
+        .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
+      const createdDate = new Date(res.body.account_created)
+      const updatedDate = new Date(res.body.account_updated)
+      chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
+
+      // Verify Email of the user
+      await verifyEmail(new_user)
+
+      // New user should have access
+      const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
       chai
         .request(server)
-        .post('/v1/user')
-        .send({
-          first_name: 'TJ',
-          last_name: 'TJ',
-          username: new_user,
-          password: password
-        })
-        .then((res) => {
-          res.should.have.status(201)
+        .get('/v1/user/self')
+        .set('AUTHORIZATION', AUTH_HEADER)
+        .end(function (_, res) {
+          res.should.have.status(200)
           const response = res.body
-          chai.expect(response.username).to.eql(new_user)
-          chai.expect(response).to.not.have.property('password')
-
           chai.expect(response.username).to.eql(new_user)
           chai.expect(response).to.not.have.property('password')
           chai.expect(response.first_name).to.eql('TJ')
@@ -781,102 +797,64 @@ describe('User Controller Tests - /self', function () {
           const updatedDate = new Date(res.body.account_updated)
           chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
         })
-        .then(() => {
-          // New user should have access
-          const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
-          chai
-            .request(server)
-            .get('/v1/user/self')
-            .set('AUTHORIZATION', AUTH_HEADER)
-            .end(function (_, res) {
-              res.should.have.status(200)
-              const response = res.body
-              chai.expect(response.username).to.eql(new_user)
-              chai.expect(response).to.not.have.property('password')
-              chai.expect(response.first_name).to.eql('TJ')
-              chai.expect(response.last_name).to.eql('TJ')
-              chai
-                .expect(response)
-                .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
-              const createdDate = new Date(res.body.account_created)
-              const updatedDate = new Date(res.body.account_updated)
-              chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
-            })
-        })
     })
 
     it('should return status 200 with proper details on /user/self after updating an user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
+      const newUserResponse = await chai.request(server).post('/v1/user').send({
+        first_name: 'TJ',
+        last_name: 'TJ',
+        username: new_user,
+        password: password
+      })
+      newUserResponse.should.have.status(201)
+      let response = newUserResponse.body
+      chai.expect(response.username).to.eql(new_user)
+      chai.expect(response.first_name).to.eql('TJ')
+      chai.expect(response.last_name).to.eql('TJ')
+
+      // Verify Email of the user
+      await verifyEmail(new_user)
+
+      // Previous function creates and validates a new user, now we update it
+      const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
+      const res = await chai.request(server).put('/v1/user/self').set('AUTHORIZATION', AUTH_HEADER).send({
+        first_name: 'PUT Update',
+        last_name: 'PUT',
+        password: 'password'
+      })
+      res.should.have.status(200)
+      response = res.body
+      chai.expect(response.username).to.eql(new_user)
+      chai.expect(response).to.not.have.property('password')
+      chai.expect(response.first_name).to.eql('PUT Update')
+      chai.expect(response.last_name).to.eql('PUT')
+      chai
+        .expect(response)
+        .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
+      const createdDate = new Date(res.body.account_created)
+      const updatedDate = new Date(res.body.account_updated)
+      chai.expect(updatedDate).to.be.greaterThan(createdDate)
+
+      // New user should have access
       chai
         .request(server)
-        .post('/v1/user')
-        .send({
-          first_name: 'TJ',
-          last_name: 'TJ',
-          username: new_user,
-          password: password
-        })
-        .then(function (newUserResponse) {
-          newUserResponse.should.have.status(201)
-          const response = newUserResponse.body
+        .get('/v1/user/self')
+        .set('AUTHORIZATION', AUTH_HEADER)
+        .end(function (_, res) {
+          res.should.have.status(200)
+          const response = res.body
           chai.expect(response.username).to.eql(new_user)
-          chai.expect(response.first_name).to.eql('TJ')
-          chai.expect(response.last_name).to.eql('TJ')
-
-          // Previous function creates and validates a new user, now we update it
-          const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
+          chai.expect(response).to.not.have.property('password')
+          chai.expect(response.first_name).to.eql('PUT Update')
+          chai.expect(response.last_name).to.eql('PUT')
           chai
-            .request(server)
-            .put('/v1/user/self')
-            .set('AUTHORIZATION', AUTH_HEADER)
-            .send({
-              first_name: 'PUT Update',
-              last_name: 'PUT',
-              password: 'password'
-            })
-            .then(function (res) {
-              res.should.have.status(200)
-              const response = res.body
-              chai.expect(response.username).to.eql(new_user)
-              chai.expect(response).to.not.have.property('password')
-              chai.expect(response.first_name).to.eql('PUT Update')
-              chai.expect(response.last_name).to.eql('PUT')
-              chai
-                .expect(response)
-                .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
-              const createdDate = new Date(res.body.account_created)
-              const updatedDate = new Date(res.body.account_updated)
-              chai.expect(updatedDate).to.be.greaterThan(createdDate)
-            })
-            .then(() => {
-              // New user should have access
-              chai
-                .request(server)
-                .get('/v1/user/self')
-                .set('AUTHORIZATION', AUTH_HEADER)
-                .end(function (_, res) {
-                  res.should.have.status(200)
-                  const response = res.body
-                  chai.expect(response.username).to.eql(new_user)
-                  chai.expect(response).to.not.have.property('password')
-                  chai.expect(response.first_name).to.eql('PUT Update')
-                  chai.expect(response.last_name).to.eql('PUT')
-                  chai
-                    .expect(response)
-                    .to.have.all.keys([
-                      'id',
-                      'first_name',
-                      'last_name',
-                      'username',
-                      'account_updated',
-                      'account_created'
-                    ])
-                  const createdDate = new Date(res.body.account_created)
-                  const updatedDate = new Date(res.body.account_updated)
-                  chai.expect(updatedDate).to.be.greaterThan(createdDate)
-                })
-            })
+            .expect(response)
+            .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
+          const createdDate = new Date(res.body.account_created)
+          const updatedDate = new Date(res.body.account_updated)
+          chai.expect(updatedDate).to.be.greaterThan(createdDate)
         })
     })
   })

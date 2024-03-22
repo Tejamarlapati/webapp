@@ -13,10 +13,9 @@
     "start": "NODE_ENV=production node server.js",
     "lint": "eslint ./**/*.ts",
     "lint:fix": "eslint ./**/*.ts --fix",
-    "test": "mocha --exit",
-    "test:watch": "mocha --watch",
-    "coverage": "nyc --all --reporter=text npm run test",
-    "tar": "",
+    "test": "NODE_ENV=test mocha --exit",
+    "test:watch": "NODE_ENV=test mocha --watch",
+    "coverage": "NODE_ENV=test nyc --all --reporter=text npm run test",
     "zip": "rm -f $npm_package_config_archivename && zip -r $npm_package_config_archivename . $npm_package_config_archiveargs"
   },
   "config": {

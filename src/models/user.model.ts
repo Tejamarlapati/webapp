@@ -10,13 +10,18 @@ class User extends Model {
   public last_name!: string
   public username!: string
   public password!: string
-  public is_verified!: boolean
+  public email_verified: boolean
+  public email_verification_token: string
+  public email_verification_expiry: Date
   public account_created!: Date
   public account_updated!: Date
 
   toJSON(): object {
-    const values = Object.assign({}, this.get())
-    delete values.password
+    const dtoKeys = new Set(['id', 'first_name', 'last_name', 'username', 'account_created', 'account_updated'])
+    const values: Record<string, unknown> = {}
+    for (const key in this.get()) {
+      if (dtoKeys.has(key)) values[key] = this.get(key)
+    }
     return values
   }
 }
@@ -37,11 +42,6 @@ User.init(
       type: DataTypes.STRING,
       allowNull: false
     },
-    is_verified: {
-      type: DataTypes.BOOLEAN,
-      allowNull: false,
-      defaultValue: false
-    },
     username: {
       type: DataTypes.STRING,
       unique: true,
@@ -50,6 +50,19 @@ User.init(
     password: {
       type: DataTypes.STRING,
       allowNull: false
+    },
+    email_verified: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      allowNull: false
+    },
+    email_verification_token: {
+      type: DataTypes.STRING,
+      allowNull: true
+    },
+    email_verification_expiry: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   },
   {

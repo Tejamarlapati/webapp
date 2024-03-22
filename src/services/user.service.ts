@@ -5,7 +5,7 @@ import validator from '../utils/validator'
 import errors from '../utils/errors'
 import crypto, { ICrypto } from '../config/crypto'
 import httpContext, { IContext } from '../config/context'
-import publisher from '../config/publisher'
+import { publisherFactory } from '../config/publisher'
 
 /**
  * The user service interface
@@ -86,7 +86,7 @@ export class UserService implements IUserService {
 
       // Publish the user created event
       logger.debug('Create user - Publishing user created event')
-      const publishResult = await publisher.publish({ userId: savedUser.id })
+      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id })
       if (!publishResult.ok) {
         logger.error('Create user - Error publishing user created event', publishResult.error)
         return errors.internalServerError('Created User. Unable to send verify email.')
