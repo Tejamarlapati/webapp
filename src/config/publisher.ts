@@ -23,7 +23,9 @@ class GoogleCloudPublisher implements IPublisher {
   private readonly pubSubClient: PubSub
 
   constructor() {
-    this.pubSubClient = new PubSub()
+    this.pubSubClient = new PubSub({
+      emulatorMode: env.isDev()
+    })
   }
 
   /**
@@ -34,7 +36,7 @@ class GoogleCloudPublisher implements IPublisher {
   async publish<T>(data: T, topicNameOrId: string): Promise<Result<string, Error>> {
     const dataBuffer = Buffer.from(JSON.stringify(data))
     try {
-      logger.info('Publishing message to topic: ', topicNameOrId)
+      logger.info('Publishing message to topic: ' + topicNameOrId)
       const messageId = await this.pubSubClient.topic(topicNameOrId).publishMessage({ data: dataBuffer })
       logger.info(`Message ${messageId} published.`)
       return Ok(messageId)

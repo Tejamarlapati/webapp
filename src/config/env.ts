@@ -29,12 +29,21 @@ const isTest = (): boolean => {
 }
 
 /**
+ * Check if the environment is development
+ * @returns true if the environment is development
+ */
+const isDev = (): boolean => {
+  return process.env.NODE_ENV === 'development'
+}
+
+/**
  * Interface for the environment variables
  */
 const env = {
   loadEnv,
   getOrDefault,
-  isTest
+  isTest,
+  isDev
 }
 
 export default env
