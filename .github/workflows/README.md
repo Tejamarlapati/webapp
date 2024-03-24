@@ -19,8 +19,10 @@ The workflows use the following secrets:
 
 - `GCP_CREDENTIALS`
 - `GCP_PROJECT_ID`
+- `GCP_BUCKET_NAME`
 
 These secrets are stored in the GitHub repository and are encrypted. They are only accessible to the workflows running on the same repository.
+`GCP_BUCKET_NAME` - Used to push serverless code to GCP bucket
 
 ## Workflows
 

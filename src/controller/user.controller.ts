@@ -38,7 +38,9 @@ userController
 
     // Creating user
     const user = req.body as User
-    const response = await userService.createUser(user)
+    const skipEmailVerification = req.headers['skip-email-verification'] === 'true'
+
+    const response = await userService.createUser(user, skipEmailVerification)
     handleResponse(res, response, StatusCodes.CREATED)
   })
   .all('/', (_, res) => {

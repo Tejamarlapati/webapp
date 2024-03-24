@@ -4,8 +4,6 @@ import server from '../../src/server'
 import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
 import database from '../../src/config/database'
 import User from '../../src/models/user.model'
-import { publisherFactory } from '../../src/config/publisher'
-import integrationTestPublisher from '../utils/publisher-utils'
 
 chai.should()
 chai.use(chaiHTTP)
@@ -18,7 +16,6 @@ const NO_USER_AUTH_HEADER = 'Basic YXNidjphc2RqaW8='
 describe('User Controller Tests - /user', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
-    publisherFactory.init(integrationTestPublisher)
     await User.sync()
     await database.syncDatabase()
   })
@@ -300,6 +297,7 @@ describe('User Controller Tests - /user', function () {
     chai
       .request(server)
       .post('/v1/user')
+      .set('skip-email-verification', 'true')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -331,7 +329,6 @@ describe('User Controller Tests - /user', function () {
 describe('User Controller Tests - /self', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
-    publisherFactory.init(integrationTestPublisher)
     await database.getDatabaseConnection().sync()
   })
 
@@ -759,7 +756,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 with proper details on /user/self after creating a new user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
-      let res = await chai.request(server).post('/v1/user').send({
+      let res = await chai.request(server).post('/v1/user').set('skip-email-verification', 'true').send({
         first_name: 'TJ',
         last_name: 'TJ',
         username: new_user,
@@ -808,7 +805,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 with proper details on /user/self after updating an user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
-      const newUserResponse = await chai.request(server).post('/v1/user').send({
+      const newUserResponse = await chai.request(server).post('/v1/user').set('skip-email-verification', 'true').send({
         first_name: 'TJ',
         last_name: 'TJ',
         username: new_user,

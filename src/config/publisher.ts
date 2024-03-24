@@ -53,12 +53,5 @@ export const publisherFactory = {
     if (publisher) return publisher
     publisher = new GoogleCloudPublisher()
     return publisher
-  },
-
-  // This method is only used for testing purposes.
-  init: (pub: IPublisher) => {
-    if (env.isTest()) {
-      publisher = pub
-    }
   }
 }

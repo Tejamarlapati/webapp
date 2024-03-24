@@ -7,6 +7,7 @@ import crypto, { ICrypto } from '../config/crypto'
 import httpContext, { IContext } from '../config/context'
 import { publisherFactory } from '../config/publisher'
 import env from '../config/env'
+import Email from '../models/email.model'
 
 /**
  * The user service interface
@@ -15,9 +16,10 @@ export interface IUserService {
   /**
    * Create a user
    * @param user the user to create
+   * @param skipEmailVerification whether to skip email verification or not
    * @returns the created user or error
    */
-  createUser(user: User): Promise<Result<User, Error>>
+  createUser(user: User, skipEmailVerification?: boolean): Promise<Result<User, Error>>
 
   /**
    * Update a user
@@ -52,7 +54,7 @@ export class UserService implements IUserService {
     this.httpContext = httpContext
   }
 
-  async createUser(user: User): Promise<Result<User, Error>> {
+  async createUser(user: User, skipEmailVerification?: boolean): Promise<Result<User, Error>> {
     try {
       logger.info('Creating user')
 
@@ -88,6 +90,13 @@ export class UserService implements IUserService {
         password: hashedPassword
       })
 
+      logger.debug('Create user - Skipping email verification: ' + skipEmailVerification)
+      // Skip email verification if not required
+      if (skipEmailVerification) {
+        logger.info('Create user - Skipped email verification')
+        newUser.email_verified = true
+      }
+
       logger.debug('Create user - Saving user to database')
       // Save the user to the database
       const savedUser = await newUser.save()
@@ -96,10 +105,14 @@ export class UserService implements IUserService {
       // Publish the user created event
       logger.debug('Create user - Publishing user created event')
       const topic = env.getOrDefault('PUBSUB_TOPIC', 'verify_email')
-      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id }, topic)
+      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id, email: user.username }, topic)
       if (!publishResult.ok) {
         logger.error('Create user - Error publishing user created event', publishResult.error)
-        return errors.internalServerError('Created User. Unable to send verify email.')
+
+        if (!skipEmailVerification) {
+          logger.debug('Returning internal server error since email verification is not skipped')
+          return errors.internalServerError('Created User. Unable to send verify email.')
+        }
       }
       logger.debug('Create user - Published user created event')
       return Ok(savedUser.toJSON() as User)
@@ -196,21 +209,28 @@ export class UserService implements IUserService {
       }
       logger.info('Successfully fetched user details for userid: ' + user.id)
 
-      logger.debug('Verifying token')
-      if (!user.email_verification_token || !user.email_verification_sent_date) {
-        logger.info('Email verify hasn"t been invoked for user ' + user.id)
-        return errors.forbiddenError('Email verify hasn"t been invoked for user')
+      if (user.email_verified) {
+        logger.info('User email already verified')
+        return Ok('Email verified')
+      }
+
+      logger.debug('Fetching user email verification details')
+      const emailRecord = await Email.findOne({ where: { user_id: user.id, email_type: 'VERIFY' } })
+      if (!emailRecord) {
+        logger.info('Email record not found')
+        return errors.notFoundError('Verification email not found')
       }
 
       logger.debug('Verification token and expiry found')
-      if (user.email_verification_token !== token) {
+      if (emailRecord.auth_token !== token) {
         logger.info('Invalid link used for verification')
         return errors.forbiddenError('Invalid link used for verification')
       }
 
       // Adding expiry duration minutes to last email sent date
       const expiryDurationInMin = parseInt(env.getOrDefault('EMAIL_EXPIRY_MINUTES', '2'))
-      const expiry = new Date(user.email_verification_sent_date.getTime() + expiryDurationInMin * 60000)
+      const email_verification_sent_date = emailRecord.sent_date
+      const expiry = new Date(email_verification_sent_date.getTime() + expiryDurationInMin * 60000)
       if (currentDate > expiry) {
         logger.info('Expired link used for verification')
         return errors.forbiddenError('Invalid/Expired link used for verification')
@@ -220,8 +240,6 @@ export class UserService implements IUserService {
 
       logger.debug('Updating user email verification status')
       user.email_verified = true
-      user.email_verification_token = null
-      user.email_verification_sent_date = null
       await user.save()
 
       logger.info('Successfully verified email for user ' + user.id)
