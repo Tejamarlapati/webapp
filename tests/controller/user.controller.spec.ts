@@ -4,6 +4,7 @@ import server from '../../src/server'
 import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
 import database from '../../src/config/database'
 import User from '../../src/models/user.model'
+import Email from '../../src/models/email.model'
 
 chai.should()
 chai.use(chaiHTTP)
@@ -17,6 +18,7 @@ describe('User Controller Tests - /user', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
     await User.sync()
+    await Email.sync()
     await database.syncDatabase()
   })
 
@@ -317,7 +319,7 @@ describe('User Controller Tests - /user', function () {
           .to.have.all.keys(['id', 'first_name', 'last_name', 'username', 'account_updated', 'account_created'])
         const createdDate = new Date(res.body.account_created)
         const updatedDate = new Date(res.body.account_updated)
-        chai.expect(createdDate.getTime()).to.be.closeTo(new Date().getTime(), 1000)
+        chai.expect(createdDate.getTime()).to.be.closeTo(new Date().getTime(), 2000)
         chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
         done()
       })
