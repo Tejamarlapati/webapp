@@ -3,8 +3,6 @@ import chaiHTTP from 'chai-http'
 import server from '../../src/server'
 import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
 import database from '../../src/config/database'
-import User from '../../src/models/user.model'
-import Email from '../../src/models/email.model'
 
 chai.should()
 chai.use(chaiHTTP)
@@ -17,8 +15,6 @@ const NO_USER_AUTH_HEADER = 'Basic YXNidjphc2RqaW8='
 describe('User Controller Tests - /user', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
-    await User.sync()
-    await Email.sync()
     await database.syncDatabase()
   })
 
