@@ -36,7 +36,7 @@ Email.init(
       allowNull: false
     },
     auth_token: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
       allowNull: true
     },
     metadata: {
