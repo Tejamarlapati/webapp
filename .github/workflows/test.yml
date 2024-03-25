@@ -8,13 +8,12 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest     
-
+    env:
+      DB_NAME: ${{ secrets.INTEGRATION_TEST_DB_NAME }}
+      DB_USER: ${{ secrets.INTEGRATION_TEST_DB_USER }}
+      DB_PASSWORD: ${{ secrets.INTEGRATION_TEST_DB_PASSWORD }}
     steps:
       - name: Enable Postgres and create database with user # PostgreSQL service is preinstalled on ubuntu-latest.
-        env:
-          DB_NAME: ${{ secrets.INTEGRATION_TEST_DB_NAME }}
-          DB_USER: ${{ secrets.INTEGRATION_TEST_DB_USER }}
-          DB_PASSWORD: ${{ secrets.INTEGRATION_TEST_DB_PASSWORD }}
         run: |
           sudo service postgresql start
           sudo -u postgres psql -c 'CREATE DATABASE "'$DB_NAME'";'
