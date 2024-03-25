@@ -105,16 +105,19 @@ export class UserService implements IUserService {
       // Publish the user created event
       logger.debug('Create user - Publishing user created event')
       const topic = env.getOrDefault('PUBSUB_TOPIC', 'verify_email')
-      const publishResult = await publisherFactory.get().publish({ userId: savedUser.id, email: user.username }, topic)
-      if (!publishResult.ok) {
-        logger.error('Create user - Error publishing user created event', publishResult.error)
 
-        if (!skipEmailVerification) {
-          logger.debug('Returning internal server error since email verification is not skipped')
+      logger.debug('Create user - Publish user created event skipped: ' + skipEmailVerification)
+      if (!skipEmailVerification) {
+        logger.info('Create user - Invoking publish user create event')
+        const publishResult = await publisherFactory
+          .get()
+          .publish({ userId: savedUser.id, email: user.username }, topic)
+        if (!publishResult.ok) {
+          logger.error('Create user - Error publishing user created event', publishResult.error)
           return errors.internalServerError('Created User. Unable to send verify email.')
         }
+        logger.debug('Create user - Published user created event')
       }
-      logger.debug('Create user - Published user created event')
       return Ok(savedUser.toJSON() as User)
     } catch (error) {
       logger.error('Error creating user', error)
