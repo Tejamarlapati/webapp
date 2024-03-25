@@ -3,6 +3,7 @@ import chaiHTTP from 'chai-http'
 import server from '../../src/server'
 import { createDefaultUsers, createOrUpdateTestUser } from '../utils/user-utils'
 import database from '../../src/config/database'
+import * as dotenv from 'dotenv'
 
 chai.should()
 chai.use(chaiHTTP)
@@ -12,10 +13,16 @@ const INTEGRATION_USER_WRONGPASS_AUTH_HEADER = 'Basic aW50ZWdyYXRpb25AdGVzdC5jb2
 const TEST_USER_AUTH_HEADER = 'Basic dGVzdEB0ZXN0LmNvbTpwYXNzd29yZA=='
 const NO_USER_AUTH_HEADER = 'Basic YXNidjphc2RqaW8='
 
+const setupEnvironment = async () => {
+  dotenv.config()
+  database.updateConnectionString()
+  await database.syncDatabase()
+}
+
 describe('User Controller Tests - /user', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
-    await database.syncDatabase()
+    await setupEnvironment()
   })
 
   this.beforeEach(async () => {
@@ -327,7 +334,7 @@ describe('User Controller Tests - /user', function () {
 describe('User Controller Tests - /self', function () {
   // Setup the database connection before all tests
   this.beforeAll(async () => {
-    await database.syncDatabase()
+    await setupEnvironment()
   })
 
   // Create users before each test
