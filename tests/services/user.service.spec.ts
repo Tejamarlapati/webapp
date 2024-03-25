@@ -46,7 +46,7 @@ describe('User Service Tests', function () {
       username: 'email@email.com',
       password: 'password'
     } as User
-    await userService.createUser(user)
+    await userService.createUser(user, true)
     const result = await userService.createUser(user, true)
     result.ok.should.be.false
     !result.ok && result.error.message.should.equal('User with this username already exists')
