@@ -4,6 +4,7 @@ import { getRequestIdFromContext, getUserIdFromContext } from './context'
 
 env.loadEnv()
 
+const hostname = env.getHostname()
 const { combine, timestamp, printf, align } = winston.format
 const logLevels = {
   fatal: 0,
@@ -17,6 +18,7 @@ const logLevels = {
 const logFormat = printf((info) => {
   const log = {
     ...info,
+    hostname,
     message: `${info.message?.trim()}`,
     userId: getUserIdFromContext(),
     requestId: getRequestIdFromContext()

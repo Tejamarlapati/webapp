@@ -1,5 +1,9 @@
 import * as dotenv from 'dotenv'
+import * as os from 'os'
 
+const getHostname = () => {
+  return os.hostname()
+}
 /**
  * Load environment variables from .env file
  */
@@ -43,7 +47,8 @@ const env = {
   loadEnv,
   getOrDefault,
   isTest,
-  isDev
+  isDev,
+  getHostname
 }
 
 export default env

@@ -6,11 +6,16 @@ import errors from '../utils/errors'
 import User from '../models/user.model'
 import { setUserIdInContext, setRequestIdInContext } from './context'
 import { handleResponse } from '../utils/response'
+import env from './env'
+
+const hostname = env.getHostname()
 
 export const requestId = () => {
-  return (_: Request, _1: Response, next: NextFunction) => {
+  return (_: Request, res: Response, next: NextFunction) => {
     const requestId = crypto.generateRandomUUID()
     setRequestIdInContext(requestId)
+    res.set('X-Request-Id', requestId)
+    res.set('X-Host', hostname)
     next()
   }
 }
