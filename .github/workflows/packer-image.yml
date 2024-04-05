@@ -5,6 +5,11 @@ on:
     branches:
       - main
 
+  # TODO: REMOVE THIS BLOCK
+  pull_request: # TODO: REMOVE THIS
+    branches:   # TODO: REMOVE THIS
+      - main    # TODO: REMOVE THIS
+
 jobs:
   test-and-build:
     runs-on: ubuntu-latest     
@@ -60,6 +65,8 @@ jobs:
     permissions:
       contents: 'read'
       id-token: 'write'
+    outputs:
+      image_name: ${{ steps.image_name.outputs.image_name }}
 
     steps:
       - name: Checkout repository
@@ -99,4 +106,37 @@ jobs:
 
       - name: Packer build
         id: build
-        run: "packer build -color=false -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' ./packer/image.pkr.hcl"
+        run: "packer build -color=false -var 'project_id=${{ secrets.GCP_PROJECT_ID }}' ./packer/image.pkr.hcl 2>&1 | sudo tee output.txt"
+
+      - name: Echo image name
+        id: image_name
+        run: |
+          tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //' > image_name.txt
+          echo "image_name=$(cat image_name.txt)" >> $GITHUB_ENV
+
+  deploy-image:
+    runs-on: ubuntu-latest
+    needs: create-image
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: 'packer'
+
+      - name: Setup gCloud
+        id: auth
+        uses: 'google-github-actions/auth@v2'
+        with:
+          credentials_json: '${{ secrets.GCP_DEPLOY_CREDENTIALS }}'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+      
+      - name: Deploy image
+        run: |
+          chmod +x ./packer/scripts/deploy-image.sh 
+          ./packer/scripts/deploy-image.sh ${{needs.create-image.outputs.image_name}}

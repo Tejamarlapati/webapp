@@ -33,7 +33,7 @@ variable "source_image_family" {
 variable "disk_size" {
   description = "The size of the disk to create"
   type        = number
-  default     = 20
+  default     = 100
 }
 
 variable "disk_type" {
