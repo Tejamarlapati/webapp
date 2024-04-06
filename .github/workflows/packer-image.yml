@@ -114,6 +114,7 @@ jobs:
         run: |
           tail -2 output.txt | head -2 
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*'
+          tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //'
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //' > image_name.txt
           cat image_name.txt
           echo "image_name=$(cat image_name.txt)" >> $GITHUB_ENV
@@ -141,6 +142,9 @@ jobs:
         uses: 'google-github-actions/setup-gcloud@v2'
       
       - name: Deploy image
+        env:
+          image_name: ${{needs.create-image.outputs.image_name}}
         run: |
+          echo $image_name
           chmod +x ./packer/scripts/deploy-image.sh 
           ./packer/scripts/deploy-image.sh ${{needs.create-image.outputs.image_name}}
