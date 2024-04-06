@@ -110,8 +110,12 @@ jobs:
 
       - name: Echo image name
         id: image_name
+        # TODO: FIX THIS BLOCK
         run: |
+          tail -2 output.txt | head -2 
+          tail -2 output.txt | head -2 | grep -o 'project: [^ ]*'
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //' > image_name.txt
+          cat image_name.txt
           echo "image_name=$(cat image_name.txt)" >> $GITHUB_ENV
 
   deploy-image:
