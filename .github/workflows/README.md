@@ -7,7 +7,7 @@ This project uses GitHub Actions for continuous integration (CI) and continuous 
 The workflows use the following secrets:
 
 - `GCP_CREDENTIALS`: The credentials for Google Cloud Platform to build Packer Image. [(IAM roles needed)](https://github.com/hashicorp/packer-plugin-googlecompute/tree/main/docs#running-on-google-cloud)
-- `GCP_DEPLOY_CREDENTIALS`: The credentials for Google Cloud Platform to deploy the web application.[(IAM roles needed)](https://github.com/hashicorp/packer-plugin-googlecompute/tree/main/docs#running-on-google-cloud)
+- `GCP_DEPLOY_CREDENTIALS`: The credentials for Google Cloud Platform to deploy the web application.[(IAM roles needed)](#iam-permissions-for-deploying)
 - `GCP_PROJECT_ID`: The project ID for the Google Cloud Platform project.
 
 - `WEBAPP_PORT`: The port number for the web application.
@@ -37,6 +37,14 @@ As of now, the following workflows are being executed:
 
 ## IAM permissions for deploying
 
+
+The following IAM permissions are needed for the service account to deploy the latest image to GCP:
+
+- `roles/compute.instanceAdmin.v1`
+- `roles/compute.loadBalancerAdmin`
+
+You can use the following commands to create a service account and assign the necessary roles
+
 ```bash
 gcp_project=YOUR_GCP_PROJECT # Replace with your GCP project ID
 
@@ -51,4 +59,8 @@ gcloud iam service-accounts create deployer \
 gcloud projects add-iam-policy-binding $gcp_project \
     --member=$service_account_member \
     --role=roles/compute.instanceAdmin.v1
+
+gcloud projects add-iam-policy-binding $gcp_project \
+    --member=$service_account_member \
+    --role=roles/compute.loadBalancerAdmin
 ```

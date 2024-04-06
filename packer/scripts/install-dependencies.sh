@@ -12,7 +12,7 @@ fi
 echo "Installing dependencies"
 
 # Update the system
-# dnf upgrade -y # TODO: UNCOMMENT THIS LINE
+dnf upgrade -y
 
 # Install Unzip if not installed
 dnf install -y unzip

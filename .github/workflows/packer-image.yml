@@ -5,11 +5,6 @@ on:
     branches:
       - main
 
-  # TODO: REMOVE THIS BLOCK
-  pull_request: # TODO: REMOVE THIS
-    branches:   # TODO: REMOVE THIS
-      - main    # TODO: REMOVE THIS
-
 jobs:
   test-and-build:
     runs-on: ubuntu-latest     
@@ -110,13 +105,8 @@ jobs:
 
       - name: Echo image name
         id: image_name
-        # TODO: FIX THIS BLOCK
         run: |
-          tail -2 output.txt | head -2 
-          tail -2 output.txt | head -2 | grep -o 'project: [^ ]*'
-          tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //'
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //' > image_name.txt
-          cat image_name.txt
           echo "image_name=$(cat image_name.txt)" >> "$GITHUB_OUTPUT"
 
   deploy-image:
@@ -145,6 +135,5 @@ jobs:
         env:
           image_name: ${{needs.create-image.outputs.image_name}}
         run: |
-          echo $image_name
           chmod +x ./packer/scripts/deploy-image.sh 
           ./packer/scripts/deploy-image.sh ${{needs.create-image.outputs.image_name}}
