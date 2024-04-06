@@ -117,7 +117,7 @@ jobs:
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //'
           tail -2 output.txt | head -2 | grep -o 'project: [^ ]*' | sed 's/project: //' > image_name.txt
           cat image_name.txt
-          echo "image_name=$(cat image_name.txt)" >> $GITHUB_ENV
+          echo "image_name=$(cat image_name.txt)" >> "$GITHUB_OUTPUT"
 
   deploy-image:
     runs-on: ubuntu-latest
