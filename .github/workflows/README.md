@@ -63,4 +63,8 @@ gcloud projects add-iam-policy-binding $gcp_project \
 gcloud projects add-iam-policy-binding $gcp_project \
     --member=$service_account_member \
     --role=roles/compute.loadBalancerAdmin
+
+gcloud projects add-iam-policy-binding $gcp_project \
+    --member=$service_account_member \
+    --role=roles/iam.serviceAccountUser
 ```
