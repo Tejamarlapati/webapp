@@ -37,11 +37,11 @@ As of now, the following workflows are being executed:
 
 ## IAM permissions for deploying
 
-
 The following IAM permissions are needed for the service account to deploy the latest image to GCP:
 
 - `roles/compute.instanceAdmin.v1`
 - `roles/compute.loadBalancerAdmin`
+- `roles/iam.serviceAccountUser`
 
 You can use the following commands to create a service account and assign the necessary roles
 
@@ -50,11 +50,6 @@ gcp_project=YOUR_GCP_PROJECT # Replace with your GCP project ID
 
 service_account_email=deployer@$gcp_project.iam.gserviceaccount.com
 service_account_member=serviceAccount:$service_account_email
-
-gcloud iam service-accounts create deployer \
-    --project $gcp_project \
-    --description="Service account to deploy latest image" \
-    --display-name="Deployer Service Account" 
 
 gcloud projects add-iam-policy-binding $gcp_project \
     --member=$service_account_member \
