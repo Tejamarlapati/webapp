@@ -77,5 +77,5 @@ echo "Updated the instance group manager: $group_manager_name"
 # Wait for the update to complete
 echo "Waiting for the update to complete. Max timeout: 20 minutes"
 gcloud compute instance-groups managed wait-until --stable "$group_manager_name" --region "$region_url" \
-    --timeout 60
+    --timeout 1200
 echo "Update completed successfully"
