@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 
 updated_image_name=${1}
 echo "Image name used for updation: $updated_image_name"
@@ -43,7 +43,6 @@ existing_vm_instance_json=$(gcloud compute instances list --filter="metadata.ite
 existing_vm_instance_name=$(printf "%s" "$existing_vm_instance_json" | jq -r '.[0].name')
 existing_vm_instance_zone=$(printf "%s" "$existing_vm_instance_json" | jq -r '.[0].zone')
 existing_vm_boot_disk_name=$(printf "%s" "$existing_vm_instance_json" | jq -r '.[0].disks[0].deviceName')
-existing_vm_boot_disk_size=$(printf "%s" "$existing_vm_instance_json" | jq -r '.[0].disks[0].diskSizeGb')
 
 echo "Retrieved information from source VM: $existing_vm_instance_name from zone: $existing_vm_instance_zone"
 
@@ -59,14 +58,16 @@ gcloud compute instance-templates create "$updated_template_name" \
     --source-instance-zone "$existing_vm_instance_zone" \
     --instance-template-region "${region}" \
     --region "$region" \
-    --boot-disk-device-name "$existing_vm_boot_disk_name" \
-    --boot-disk-size "$existing_vm_boot_disk_size"GB \
     --configure-disk=device-name="$existing_vm_boot_disk_name",instantiate-from=custom-image,custom-image="$image_self_link" \
 
-updated_instance_template_json=$(gcloud compute instance-templates describe "$updated_template_name" --region="$region_url" --format="json")
-echo "New Instance Template created: $updated_template_name"
+updated_instance_template_self_link=$(gcloud compute instance-templates describe "$updated_template_name" --region="$region_url" --format="value(selfLink)")
 
-updated_instance_template_self_link=$(printf "%s" "$updated_instance_template_json" | jq -r '.selfLink')
+if [ -z "$updated_instance_template_self_link" ]; then
+    echo "Instance template not created"
+    exit 1
+fi
+
+echo "New Instance Template created succesfully: $updated_template_name"
 
 echo "Executing rolling update for instance group manager: $group_manager_name with new instance template: $updated_instance_template_self_link"
 gcloud compute instance-groups managed rolling-action start-update "$group_manager_name" --region "$region_url" \
@@ -76,5 +77,5 @@ echo "Updated the instance group manager: $group_manager_name"
 # Wait for the update to complete
 echo "Waiting for the update to complete. Max timeout: 20 minutes"
 gcloud compute instance-groups managed wait-until --stable "$group_manager_name" --region "$region_url" \
-    --timeout 1200
+    --timeout 60
 echo "Update completed successfully"
