@@ -25,7 +25,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 405 on /user GET', function (done) {
     chai
       .request(server)
-      .get('/v1/user')
+      .get('/v2/user')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -36,7 +36,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 405 on /user PUT', function (done) {
     chai
       .request(server)
-      .put('/v1/user')
+      .put('/v2/user')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -47,7 +47,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 405 on /user DELETE', function (done) {
     chai
       .request(server)
-      .delete('/v1/user')
+      .delete('/v2/user')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -58,7 +58,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 405 on /user PATCH', function (done) {
     chai
       .request(server)
-      .patch('/v1/user')
+      .patch('/v2/user')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -69,7 +69,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST with no body', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .send('')
       .end(function (_, res) {
         res.should.have.status(400)
@@ -81,7 +81,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST with empty JSON', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .send({})
       .end(function (_, res) {
         res.should.have.status(400)
@@ -93,7 +93,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid JSON', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send('{"first_name"')
       .end(function (_, res) {
@@ -106,7 +106,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid data', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ'
@@ -121,7 +121,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid username', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -139,7 +139,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid password 1', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -160,7 +160,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid password 2', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -181,7 +181,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid first_name max length', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'LENGTHMORETHAN100'.repeat(20),
@@ -202,7 +202,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid field account_created', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'LENGTHMORETHAN100',
@@ -221,7 +221,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST invalid data', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: '',
@@ -239,7 +239,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST duplicate user', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -257,7 +257,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST query params', function (done) {
     chai
       .request(server)
-      .post('/v1/user?query')
+      .post('/v2/user?query')
       .set('Content-Type', 'application/json')
       .send({
         first_name: 'TJ',
@@ -275,7 +275,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 400 on /user POST with id', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('Content-Type', 'application/json')
       .send({
         id: '123',
@@ -294,7 +294,7 @@ describe('User Controller Tests - /user', function () {
   it('should return status 201 on /user POST', function (done) {
     chai
       .request(server)
-      .post('/v1/user')
+      .post('/v2/user')
       .set('skip-email-verification', 'true')
       .set('Content-Type', 'application/json')
       .send({
@@ -338,7 +338,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 405 on /user/self POST', function (done) {
     chai
       .request(server)
-      .post('/v1/user/self')
+      .post('/v2/user/self')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -349,7 +349,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 405 on /user/self PATCH', function (done) {
     chai
       .request(server)
-      .patch('/v1/user/self')
+      .patch('/v2/user/self')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -360,7 +360,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 405 on /user/self DELETE', function (done) {
     chai
       .request(server)
-      .delete('/v1/user/self')
+      .delete('/v2/user/self')
       .end(function (_, res) {
         res.should.have.status(405)
         chai.expect(res.body).to.be.empty
@@ -371,7 +371,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 401 on /user/self GET without auth', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .end(function (_, res) {
         res.should.have.status(401)
         chai.expect(res.body).to.be.empty
@@ -382,7 +382,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 401 on /user/self GET with query params', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self?qwuer')
+      .get('/v2/user/self?qwuer')
       .end(function (_, res) {
         res.should.have.status(401)
         chai.expect(res.body).to.be.empty
@@ -393,7 +393,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 401 on /user/self PUT without auth', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .end(function (_, res) {
         res.should.have.status(401)
         chai.expect(res.body).to.be.empty
@@ -404,7 +404,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 401 on /user/self PUT with query params', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self?qwuer')
+      .put('/v2/user/self?qwuer')
       .end(function (_, res) {
         res.should.have.status(401)
         chai.expect(res.body).to.be.empty
@@ -415,7 +415,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 200 on /user/self GET', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('AUTHORIZATION', INTEGRATION_USER_AUTH_HEADER)
       .end(function (_, res) {
         res.should.have.status(200)
@@ -434,7 +434,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self GET with query params', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self?qwuer')
+      .get('/v2/user/self?qwuer')
       .set('AUTHORIZATION', INTEGRATION_USER_AUTH_HEADER)
       .end(function (_, res) {
         res.should.have.status(400)
@@ -446,7 +446,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self GET with body', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('AUTHORIZATION', INTEGRATION_USER_AUTH_HEADER)
       .send({ id: 'TJ' })
       .end(function (_, res) {
@@ -459,7 +459,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self GET with no user in db', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('AUTHORIZATION', NO_USER_AUTH_HEADER)
       .end(function (_, res) {
         res.should.have.status(401)
@@ -471,7 +471,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self GET with wrong pass', function (done) {
     chai
       .request(server)
-      .get('/v1/user/self')
+      .get('/v2/user/self')
       .set('AUTHORIZATION', INTEGRATION_USER_WRONGPASS_AUTH_HEADER)
       .end(function (_, res) {
         res.should.have.status(401)
@@ -483,7 +483,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send username', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: 'PUT',
@@ -501,7 +501,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send empty fields 1', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: 'PUT',
@@ -518,7 +518,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send empty body', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({})
       .end(function (_, res) {
@@ -531,7 +531,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send empty fields 2', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: '',
@@ -548,7 +548,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send empty fields 3', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: 'A',
@@ -565,7 +565,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send id', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         id: '12',
@@ -583,7 +583,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send invalid first_name', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: 'VERYLONGNAME100'.repeat(20),
@@ -600,7 +600,7 @@ describe('User Controller Tests - /self', function () {
   it('should return status 400 on /user/self PUT send invalid password', function (done) {
     chai
       .request(server)
-      .put('/v1/user/self')
+      .put('/v2/user/self')
       .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
       .send({
         first_name: 'TESTTT',
@@ -625,7 +625,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 on /user/self PUT', function (done) {
       chai
         .request(server)
-        .put('/v1/user/self')
+        .put('/v2/user/self')
         .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
         .send({
           first_name: 'PUT Update',
@@ -652,7 +652,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 on /user/self PUT partial update 1', function (done) {
       chai
         .request(server)
-        .put('/v1/user/self')
+        .put('/v2/user/self')
         .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
         .send({
           first_name: 'PUT Update Partial'
@@ -677,7 +677,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 on /user/self PUT partial update 2', function (done) {
       chai
         .request(server)
-        .put('/v1/user/self')
+        .put('/v2/user/self')
         .set('AUTHORIZATION', TEST_USER_AUTH_HEADER)
         .send({
           last_name: 'PUT Update Partial last_name'
@@ -708,7 +708,7 @@ describe('User Controller Tests - /self', function () {
       await createOrUpdateTestUser(new_user)
       chai
         .request(server)
-        .put('/v1/user/self')
+        .put('/v2/user/self')
         .set('AUTHORIZATION', OLD_PASSWORD_AUTH_HEADER)
         .send({
           password: new_user_password
@@ -723,7 +723,7 @@ describe('User Controller Tests - /self', function () {
           // Old password auth header should be unauthorized
           chai
             .request(server)
-            .get('/v1/user/self')
+            .get('/v2/user/self')
             .set('AUTHORIZATION', OLD_PASSWORD_AUTH_HEADER)
             .end(function (_, res) {
               res.should.have.status(401)
@@ -732,7 +732,7 @@ describe('User Controller Tests - /self', function () {
           // New password auth header should have access
           chai
             .request(server)
-            .get('/v1/user/self')
+            .get('/v2/user/self')
             .set('AUTHORIZATION', NEW_PASSWORD_AUTH_HEADER)
             .end(function (_, res) {
               const response = res.body
@@ -754,7 +754,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 with proper details on /user/self after creating a new user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
-      let res = await chai.request(server).post('/v1/user').set('skip-email-verification', 'true').send({
+      let res = await chai.request(server).post('/v2/user').set('skip-email-verification', 'true').send({
         first_name: 'TJ',
         last_name: 'TJ',
         username: new_user,
@@ -774,7 +774,7 @@ describe('User Controller Tests - /self', function () {
       chai.expect(updatedDate.getTime()).to.be.closeTo(createdDate.getTime(), 100)
 
       // Verify Email of the user
-      res = await chai.request(server).get(`/v1/user/verify?email=${new_user}&auth_token=${response.id}`).send()
+      res = await chai.request(server).get(`/v2/user/verify?email=${new_user}&auth_token=${response.id}`).send()
       res.should.have.status(200)
       chai.expect(res.body).to.eql('Email verified')
 
@@ -782,7 +782,7 @@ describe('User Controller Tests - /self', function () {
       const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
       chai
         .request(server)
-        .get('/v1/user/self')
+        .get('/v2/user/self')
         .set('AUTHORIZATION', AUTH_HEADER)
         .end(function (_, res) {
           res.should.have.status(200)
@@ -803,7 +803,7 @@ describe('User Controller Tests - /self', function () {
     it('should return status 200 with proper details on /user/self after updating an user', async () => {
       const new_user = 'usertest' + Date.now() + '@usertest.com'
       const password = 'password'
-      const newUserResponse = await chai.request(server).post('/v1/user').set('skip-email-verification', 'true').send({
+      const newUserResponse = await chai.request(server).post('/v2/user').set('skip-email-verification', 'true').send({
         first_name: 'TJ',
         last_name: 'TJ',
         username: new_user,
@@ -816,13 +816,13 @@ describe('User Controller Tests - /self', function () {
       chai.expect(response.last_name).to.eql('TJ')
 
       // Verify Email of the user
-      let res = await chai.request(server).get(`/v1/user/verify?email=${new_user}&auth_token=${response.id}`).send()
+      let res = await chai.request(server).get(`/v2/user/verify?email=${new_user}&auth_token=${response.id}`).send()
       res.should.have.status(200)
       chai.expect(res.body).to.eql('Email verified')
 
       // Previous function creates and validates a new user, now we update it
       const AUTH_HEADER = `Basic ${Buffer.from(`${new_user}:${password}`).toString('base64')}`
-      res = await chai.request(server).put('/v1/user/self').set('AUTHORIZATION', AUTH_HEADER).send({
+      res = await chai.request(server).put('/v2/user/self').set('AUTHORIZATION', AUTH_HEADER).send({
         first_name: 'PUT Update',
         last_name: 'PUT',
         password: 'password'
@@ -843,7 +843,7 @@ describe('User Controller Tests - /self', function () {
       // New user should have access
       chai
         .request(server)
-        .get('/v1/user/self')
+        .get('/v2/user/self')
         .set('AUTHORIZATION', AUTH_HEADER)
         .end(function (_, res) {
           res.should.have.status(200)
