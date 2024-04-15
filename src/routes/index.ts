@@ -15,7 +15,7 @@ const routes = (app: Application) => {
   app.use('/healthz', nocache(), noCachePragma(), healthCheckController)
 
   // User routes
-  app.use('/v1/user', userController)
+  app.use('/v2/user', userController)
 
   // Default fallback route
   app.route('*').all((_, res) => {
